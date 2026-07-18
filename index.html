@@ -214,6 +214,9 @@
       </div>
 
       <div id="methodBox" class="ref-note" style="margin-top:1rem;display:none;"></div>
+
+      <button id="saveBtn" type="button" style="margin-top:1.25rem;width:100%;background:var(--teal);color:#fff;border:none;border-radius:8px;padding:12px;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;">Enregistrer mes informations</button>
+      <div id="saveConfirm" style="text-align:center;font-size:12.5px;color:var(--teal-text);margin-top:8px;height:16px;"></div>
     </div>
 
     <div class="card">
@@ -285,7 +288,9 @@ var els = {
   leaseType: document.getElementById('leaseType'),
   noticeWindowBox: document.getElementById('noticeWindowBox'),
   noticeReceived: document.getElementById('noticeReceived'),
-  methodBox: document.getElementById('methodBox')
+  methodBox: document.getElementById('methodBox'),
+  saveBtn: document.getElementById('saveBtn'),
+  saveConfirm: document.getElementById('saveConfirm')
 };
 
 var REF_RATE = 3.1;
@@ -465,6 +470,12 @@ function drawChart(data){
 
 loadInputs();
 recalc();
+
+els.saveBtn.addEventListener('click', function(){
+  saveInputs();
+  els.saveConfirm.textContent = '✅ Enregistré sur cet appareil';
+  setTimeout(function(){ els.saveConfirm.textContent = ''; }, 3000);
+});
 </script>
 </body>
 </html>
