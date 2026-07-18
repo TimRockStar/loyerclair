@@ -148,6 +148,13 @@
   .res-card p{font-size:13.5px;color:var(--ink-2);line-height:1.6;margin-bottom:8px;}
   .res-card a{color:var(--teal-text);font-weight:600;text-decoration:none;}
   .res-card a:hover{text-decoration:underline;}
+  .option-card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:1.5rem;margin-bottom:1rem;display:flex;gap:16px;}
+  .option-num{font-family:'Roboto Slab',serif;font-size:22px;font-weight:700;color:var(--teal);flex-shrink:0;width:32px;}
+  .option-card h3{font-family:'Roboto Slab',serif;font-size:16px;font-weight:600;color:var(--ink);margin-bottom:8px;}
+  .option-card p{font-size:13.5px;color:var(--ink-2);line-height:1.6;margin-bottom:6px;}
+  .option-card ul{margin:8px 0 0 18px;font-size:13.5px;color:var(--ink-2);line-height:1.7;}
+  .option-card a{color:var(--teal-text);font-weight:600;text-decoration:none;}
+  .option-card a:hover{text-decoration:underline;}
 </style>
 </head>
 <body>
@@ -161,6 +168,7 @@
   <div class="tabs">
     <button class="tab-btn active" data-page="calc">Calculateur</button>
     <button class="tab-btn" data-page="logements">Logements abordables</button>
+    <button class="tab-btn" data-page="guide">Que faire?</button>
   </div>
 
   <div id="page-calc" class="page active">
@@ -313,6 +321,46 @@
       <p>Contrairement aux HLM, il n'existe pas de guichet unique pour les coopératives et OBNL — il faut généralement contacter chaque organisme séparément. Ces deux ressources nationales peuvent t'aider à démarrer ta recherche, peu importe ta région :</p>
       <p><a href="https://rqoh.com/" target="_blank" rel="noopener">Réseau québécois des OSBL d'habitation ↗</a></p>
       <p><a href="https://www.habitation.gouv.qc.ca/" target="_blank" rel="noopener">Société d'habitation du Québec ↗</a> — pour trouver l'office d'habitation de ta municipalité si elle n'est pas listée ci-dessus</p>
+    </div>
+  </div>
+
+  <div id="page-guide" class="page">
+    <div class="ref-note" style="margin-bottom:1.5rem;">
+      Tu viens de recevoir un avis d'augmentation de loyer? Voici les <b>3 vraies options légales</b> au Québec, selon le Code civil du Québec. Ce n'est pas un conseil juridique — pour ta situation précise, consulte <a href="https://educaloi.qc.ca/capsules/le-renouvellement-de-bail-et-la-hausse-de-loyer/" target="_blank" rel="noopener">Éducaloi ↗</a> ou le <a href="https://www.tal.gouv.qc.ca/" target="_blank" rel="noopener">TAL ↗</a>.
+    </div>
+
+    <div class="option-card">
+      <div class="option-num">1</div>
+      <div>
+        <h3>Accepter (ou ne rien faire)</h3>
+        <p>Si tu ne réponds pas dans le mois suivant la réception de l'avis, ton bail est automatiquement renouvelé <b>avec les nouvelles conditions</b>, incluant l'augmentation proposée. C'est la voie la plus simple si l'augmentation te semble raisonnable.</p>
+      </div>
+    </div>
+
+    <div class="option-card">
+      <div class="option-num">2</div>
+      <div>
+        <h3>Refuser, mais rester dans ton logement</h3>
+        <p>Tu as <b>1 mois</b> après avoir reçu l'avis pour envoyer un refus écrit à ton propriétaire. Ensuite, trois choses peuvent arriver :</p>
+        <ul>
+          <li>Le propriétaire ne fait rien → ton bail est renouvelé aux <b>anciennes conditions</b> (sans l'augmentation)</li>
+          <li>Vous négociez ensemble une entente à l'amiable</li>
+          <li>Le propriétaire s'adresse au TAL (dans le mois suivant ton refus) pour qu'un juge tranche</li>
+        </ul>
+        <p style="margin-top:8px;">Le TAL fournit un <a href="https://www.tal.gouv.qc.ca/sites/default/files/notices/TAL_806_E.pdf" target="_blank" rel="noopener">modèle d'avis de refus ↗</a> que tu peux utiliser.</p>
+      </div>
+    </div>
+
+    <div class="option-card">
+      <div class="option-num">3</div>
+      <div>
+        <h3>Refuser et quitter le logement</h3>
+        <p>Si tu préfères déménager plutôt qu'accepter l'augmentation, envoie un <b>avis écrit de non-reconduction</b> à ton propriétaire, dans le même délai que la fenêtre légale d'avis (voir l'onglet Calculateur pour la tienne).</p>
+      </div>
+    </div>
+
+    <div class="ref-note" style="margin-top:1.5rem;">
+      <b>Bon à savoir :</b> aucune de ces trois options n'exige d'aller en cour immédiatement — la plupart des situations se règlent par la négociation directe ou simplement en laissant le bail se renouveler aux anciennes conditions si le propriétaire n'insiste pas.
     </div>
   </div>
 
