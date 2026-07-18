@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LoyerClair — Vois clair dans ton augmentation de loyer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#16233F;
+    --ink-2:#233458;
+    --paper:#EEF1F6;
+    --card:#FFFFFF;
+    --line:#D7DCE6;
+    --sub:#5B6478;
+    --amber:#C9922E;
+    --amber-bg:#FBF1E1;
+    --amber-text:#7A5A15;
+    --teal:#3F7D6E;
+    --teal-bg:#E7F2EE;
+    --teal-text:#245346;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:'Inter',sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.5;
+    padding:0 0 4rem;
+  }
+  .wrap{max-width:960px;margin:0 auto;padding:0 1.25rem;}
+  header{padding:2.5rem 0 1.5rem;border-bottom:1px solid var(--line);margin-bottom:2rem;}
+  .word{font-family:'Roboto Slab',serif;font-weight:700;font-size:28px;color:var(--ink);letter-spacing:-0.01em;}
+  .word span{color:var(--teal);}
+  .tagline{font-size:15px;color:var(--sub);margin-top:6px;max-width:520px;}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
+  @media(max-width:760px){.grid{grid-template-columns:1fr;}}
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:1.75rem;
+  }
+  .card h2{
+    font-family:'Roboto Slab',serif;
+    font-size:15px;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:var(--sub);
+    margin-bottom:1.25rem;
+  }
+  .field{margin-bottom:1.25rem;}
+  .field label{
+    display:block;
+    font-size:13px;
+    font-weight:600;
+    color:var(--ink-2);
+    margin-bottom:6px;
+  }
+  .field .hint{font-size:11.5px;color:var(--sub);font-weight:400;display:block;margin-top:4px;}
+  .input-row{position:relative;}
+  input[type="number"]{
+    width:100%;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:18px;
+    font-weight:600;
+    color:var(--ink);
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:10px 14px;
+    outline:none;
+    transition:border-color .15s;
+  }
+  input[type="number"]:focus{border-color:var(--teal);}
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+  .unit{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--sub);font-weight:500;pointer-events:none;}
+  .slider-row{display:flex;align-items:center;gap:12px;margin-top:6px;}
+  input[type="range"]{flex:1;accent-color:var(--teal);}
+  .slider-val{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:14px;min-width:44px;text-align:right;}
+  .ref-note{
+    background:var(--paper);
+    border-radius:8px;
+    padding:12px 14px;
+    font-size:12.5px;
+    color:var(--sub);
+    margin-top:1.5rem;
+    line-height:1.55;
+  }
+  .ref-note b{color:var(--ink-2);}
+  .signal{
+    border-radius:10px;
+    padding:1.25rem 1.5rem;
+    margin-bottom:1.25rem;
+  }
+  .signal.normal{background:var(--teal-bg);}
+  .signal.high{background:var(--amber-bg);}
+  .signal-label{
+    font-size:11px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    margin-bottom:6px;
+  }
+  .signal.normal .signal-label{color:var(--teal-text);}
+  .signal.high .signal-label{color:var(--amber-text);}
+  .signal-text{font-size:14.5px;line-height:1.5;}
+  .signal.normal .signal-text{color:var(--teal-text);}
+  .signal.high .signal-text{color:var(--amber-text);}
+  .signal a{color:inherit;font-weight:600;text-decoration:underline;}
+  .stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.5rem;}
+  .stat{background:var(--paper);border-radius:8px;padding:14px 16px;}
+  .stat-label{font-size:11.5px;color:var(--sub);font-weight:600;text-transform:uppercase;letter-spacing:.04em;}
+  .stat-value{font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:600;color:var(--ink);margin-top:4px;}
+  .stat-value.warn{color:var(--amber-text);}
+  .chart-title{font-size:13px;font-weight:600;color:var(--ink-2);margin-bottom:8px;}
+  svg{width:100%;height:auto;display:block;}
+  .legend{display:flex;gap:18px;margin-top:10px;font-size:12px;color:var(--sub);}
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .dot{width:10px;height:10px;border-radius:2px;display:inline-block;}
+  footer{margin-top:2.5rem;padding-top:1.5rem;border-top:1px solid var(--line);font-size:12px;color:var(--sub);line-height:1.6;}
+  footer a{color:var(--ink-2);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="word">Loyer<span>Clair</span></div>
+    <div class="tagline">Vois où ton loyer s'en va — et si ta hausse est dans la norme.</div>
+  </header>
+
+  <div class="grid">
+
+    <div class="card">
+      <h2>Ta situation</h2>
+
+      <div class="field">
+        <label for="rent">Loyer actuel</label>
+        <div class="input-row">
+          <input type="number" id="rent" value="900" min="0" step="1">
+          <span class="unit">$ / mois</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="increase">Augmentation proposée par le propriétaire</label>
+        <div class="input-row">
+          <input type="number" id="increase" value="65" min="0" step="1">
+          <span class="unit">$ / mois</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="salary">Ton salaire annuel</label>
+        <div class="input-row">
+          <input type="number" id="salary" value="45000" min="0" step="500">
+          <span class="unit">$ / an</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Croissance salariale estimée par année <span class="hint">Ta propre estimation — augmentation moyenne, échelon, etc.</span></label>
+        <div class="slider-row">
+          <input type="range" id="salaryGrowth" min="0" max="8" step="0.5" value="2">
+          <span class="slider-val" id="salaryGrowthVal">2 %</span>
+        </div>
+      </div>
+
+      <div class="field" style="margin-bottom:0;">
+        <label>Croissance du loyer si la tendance continue <span class="hint">Par défaut, le taux de référence officiel 2026</span></label>
+        <div class="slider-row">
+          <input type="range" id="rentGrowth" min="0" max="10" step="0.1" value="3.1">
+          <span class="slider-val" id="rentGrowthVal">3.1 %</span>
+        </div>
+      </div>
+
+      <div class="ref-note">
+        <b>Taux de référence officiel 2026 :</b> 3,1 % (moyenne de l'inflation sur 3 ans), pour les baux renouvelés entre le 2 avril 2026 et le 1er avril 2027. Ce taux est une référence, pas un plafond — un propriétaire peut justifier plus avec de vraies dépenses (taxes, assurances, rénovations).
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Ce que ça donne</h2>
+
+      <div id="signalBox" class="signal normal">
+        <div class="signal-label" id="signalLabel">Dans la norme</div>
+        <div class="signal-text" id="signalText"></div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-label">Ton augmentation</div>
+          <div class="stat-value" id="increasePercent">—</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Taux de référence</div>
+          <div class="stat-value" id="refPercent">3,1 %</div>
+        </div>
+      </div>
+
+      <div class="chart-title">Loyer vs. salaire, sur 5 ans</div>
+      <svg id="chart" viewBox="0 0 460 220"></svg>
+      <div class="legend">
+        <span><span class="dot" style="background:#C9922E;"></span>% du salaire pour le loyer</span>
+      </div>
+
+      <div class="stats" style="margin-top:1.25rem;">
+        <div class="stat">
+          <div class="stat-label">Aujourd'hui</div>
+          <div class="stat-value" id="pctNow">—</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Dans 5 ans</div>
+          <div class="stat-value warn" id="pctFuture">—</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    LoyerClair donne une estimation à titre indicatif seulement — ce n'est pas une décision légale. Pour une confirmation officielle de ta situation précise, utilise le <a href="https://www.tal.gouv.qc.ca/fr/calcul-pour-l-augmentation-de-loyer" target="_blank" rel="noopener">calculateur officiel du Tribunal administratif du logement</a>.
+  </footer>
+
+</div>
+
+<script>
+function fmtPct(n){ return n.toLocaleString('fr-CA',{minimumFractionDigits:1,maximumFractionDigits:1}) + ' %'; }
+function fmtMoney(n){ return Math.round(n).toLocaleString('fr-CA') + ' $'; }
+
+var els = {
+  rent: document.getElementById('rent'),
+  increase: document.getElementById('increase'),
+  salary: document.getElementById('salary'),
+  salaryGrowth: document.getElementById('salaryGrowth'),
+  rentGrowth: document.getElementById('rentGrowth'),
+  salaryGrowthVal: document.getElementById('salaryGrowthVal'),
+  rentGrowthVal: document.getElementById('rentGrowthVal'),
+  signalBox: document.getElementById('signalBox'),
+  signalLabel: document.getElementById('signalLabel'),
+  signalText: document.getElementById('signalText'),
+  increasePercent: document.getElementById('increasePercent'),
+  refPercent: document.getElementById('refPercent'),
+  pctNow: document.getElementById('pctNow'),
+  pctFuture: document.getElementById('pctFuture'),
+  chart: document.getElementById('chart')
+};
+
+var REF_RATE = 3.1;
+
+function recalc(){
+  var rent = parseFloat(els.rent.value) || 0;
+  var increaseAmount = parseFloat(els.increase.value) || 0;
+  var salary = parseFloat(els.salary.value) || 0;
+  var salaryGrowth = parseFloat(els.salaryGrowth.value);
+  var rentGrowth = parseFloat(els.rentGrowth.value);
+
+  els.salaryGrowthVal.textContent = fmtPct(salaryGrowth);
+  els.rentGrowthVal.textContent = fmtPct(rentGrowth);
+  els.refPercent.textContent = fmtPct(REF_RATE);
+
+  var increasePct = rent > 0 ? (increaseAmount / rent) * 100 : 0;
+  els.increasePercent.textContent = fmtPct(increasePct);
+
+  var isHigh = increasePct > REF_RATE * 1.5;
+  els.signalBox.className = 'signal ' + (isHigh ? 'high' : 'normal');
+  els.signalLabel.textContent = isHigh ? 'Nettement plus élevée que la référence' : 'Dans la norme';
+  if(isHigh){
+    els.signalText.innerHTML = 'Ton augmentation (' + fmtPct(increasePct) + ') est bien au-dessus du taux de référence 2026 (' + fmtPct(REF_RATE) + '). Ça ne veut pas dire qu\'elle est illégale — le propriétaire peut la justifier avec de vraies dépenses — mais ça vaut la peine de vérifier avec le <a href="https://www.tal.gouv.qc.ca/fr/calcul-pour-l-augmentation-de-loyer" target="_blank" rel="noopener">calculateur officiel du TAL ↗</a>.';
+  } else {
+    els.signalText.innerHTML = 'Ton augmentation (' + fmtPct(increasePct) + ') est proche du taux de référence 2026 (' + fmtPct(REF_RATE) + '). Ça semble raisonnable, mais tu peux toujours confirmer avec le <a href="https://www.tal.gouv.qc.ca/fr/calcul-pour-l-augmentation-de-loyer" target="_blank" rel="noopener">calculateur officiel du TAL ↗</a>.';
+  }
+
+  var years = [0,1,2,3,4,5];
+  var pctData = years.map(function(y){
+    var futureRent = rent * Math.pow(1 + rentGrowth/100, y);
+    var futureSalary = salary * Math.pow(1 + salaryGrowth/100, y);
+    return futureSalary > 0 ? (futureRent * 12 / futureSalary) * 100 : 0;
+  });
+
+  els.pctNow.textContent = fmtPct(pctData[0]);
+  els.pctFuture.textContent = fmtPct(pctData[5]);
+
+  drawChart(pctData);
+}
+
+function drawChart(data){
+  var w = 460, h = 220, padL = 40, padR = 16, padT = 16, padB = 30;
+  var innerW = w - padL - padR, innerH = h - padT - padB;
+  var maxVal = Math.max.apply(null, data) * 1.15;
+  var minVal = 0;
+
+  function x(i){ return padL + (i/(data.length-1)) * innerW; }
+  function y(v){ return padT + innerH - ((v - minVal)/(maxVal - minVal)) * innerH; }
+
+  var pathD = data.map(function(v,i){ return (i===0?'M':'L') + x(i) + ',' + y(v); }).join(' ');
+  var areaD = pathD + ' L' + x(data.length-1) + ',' + (padT+innerH) + ' L' + x(0) + ',' + (padT+innerH) + ' Z';
+
+  var gridLines = '';
+  var steps = 4;
+  for(var s=0; s<=steps; s++){
+    var gv = minVal + (maxVal-minVal) * s/steps;
+    var gy = y(gv);
+    gridLines += '<line x1="'+padL+'" y1="'+gy+'" x2="'+(w-padR)+'" y2="'+gy+'" stroke="#D7DCE6" stroke-width="1"/>';
+    gridLines += '<text x="'+(padL-8)+'" y="'+(gy+4)+'" text-anchor="end" font-size="10" fill="#5B6478" font-family="IBM Plex Mono, monospace">'+Math.round(gv)+'%</text>';
+  }
+
+  var xLabels = '';
+  data.forEach(function(v,i){
+    xLabels += '<text x="'+x(i)+'" y="'+(h-8)+'" text-anchor="middle" font-size="10" fill="#5B6478" font-family="Inter, sans-serif">'+(i===0?'Auj.':'+'+i+' an'+(i>1?'s':''))+'</text>';
+  });
+
+  var dots = data.map(function(v,i){
+    return '<circle cx="'+x(i)+'" cy="'+y(v)+'" r="3.5" fill="#C9922E" stroke="#FFFFFF" stroke-width="1.5"/>';
+  }).join('');
+
+  els.chart.innerHTML =
+    gridLines +
+    '<path d="'+areaD+'" fill="#C9922E" fill-opacity="0.12"/>' +
+    '<path d="'+pathD+'" fill="none" stroke="#C9922E" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>' +
+    dots +
+    xLabels;
+}
+
+[els.rent, els.increase, els.salary, els.salaryGrowth, els.rentGrowth].forEach(function(el){
+  el.addEventListener('input', recalc);
+});
+
+recalc();
+</script>
+</body>
+</html>
