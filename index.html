@@ -30,7 +30,10 @@
     padding:0 0 4rem;
   }
   .wrap{max-width:960px;margin:0 auto;padding:0 1.25rem;}
-  header{padding:2.5rem 0 1.5rem;border-bottom:1px solid var(--line);margin-bottom:2rem;}
+  header{padding:2.5rem 0 1.5rem;border-bottom:1px solid var(--line);margin-bottom:2rem;display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;}
+  .lang-toggle{display:flex;gap:2px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:2px;flex-shrink:0;}
+  .lang-btn{font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--sub);background:transparent;border:none;border-radius:6px;padding:6px 12px;cursor:pointer;}
+  .lang-btn.active{background:var(--teal);color:#fff;}
   .word{font-family:'Roboto Slab',serif;font-weight:700;font-size:28px;color:var(--ink);letter-spacing:-0.01em;}
   .word span{color:var(--teal);}
   .tagline{font-size:15px;color:var(--sub);margin-top:6px;max-width:520px;}
@@ -161,24 +164,30 @@
 <div class="wrap">
 
   <header>
-    <div class="word">Loyer<span>Clair</span></div>
-    <div class="tagline">Vois où ton loyer s'en va — et si ta hausse est dans la norme.</div>
+    <div>
+      <div class="word">Loyer<span>Clair</span></div>
+      <div class="tagline" id="tagline" data-i18n="tagline">Vois où ton loyer s'en va — et si ta hausse est dans la norme.</div>
+    </div>
+    <div class="lang-toggle">
+      <button class="lang-btn active" id="lang-fr" onclick="setLang('fr')">FR</button>
+      <button class="lang-btn" id="lang-en" onclick="setLang('en')">EN</button>
+    </div>
   </header>
 
   <div class="tabs">
-    <button class="tab-btn active" data-page="calc">Calculateur</button>
-    <button class="tab-btn" data-page="logements">Logements abordables</button>
-    <button class="tab-btn" data-page="guide">Que faire?</button>
+    <button class="tab-btn active" data-page="calc" data-i18n="tab_calc">Calculateur</button>
+    <button class="tab-btn" data-page="logements" data-i18n="tab_logements">Logements abordables</button>
+    <button class="tab-btn" data-page="guide" data-i18n="tab_guide">Que faire?</button>
   </div>
 
   <div id="page-calc" class="page active">
   <div class="grid">
 
     <div class="card">
-      <h2>Ta situation</h2>
+      <h2 data-i18n="h2_situation">Ta situation</h2>
 
       <div class="field">
-        <label for="rent">Loyer actuel</label>
+        <label for="rent" data-i18n="lbl_rent">Loyer actuel</label>
         <div class="input-row">
           <input type="number" id="rent" value="900" min="0" step="1">
           <span class="unit">$ / mois</span>
@@ -186,7 +195,7 @@
       </div>
 
       <div class="field">
-        <label for="increase">Augmentation proposée par le propriétaire</label>
+        <label for="increase" data-i18n="lbl_increase">Augmentation proposée par le propriétaire</label>
         <div class="input-row">
           <input type="number" id="increase" value="65" min="0" step="1">
           <span class="unit">$ / mois</span>
@@ -194,7 +203,7 @@
       </div>
 
       <div class="field">
-        <label for="salary">Ton salaire annuel</label>
+        <label for="salary" data-i18n="lbl_salary">Ton salaire annuel</label>
         <div class="input-row">
           <input type="number" id="salary" value="45000" min="0" step="500">
           <span class="unit">$ / an</span>
@@ -202,7 +211,7 @@
       </div>
 
       <div class="field">
-        <label>Croissance salariale estimée par année <span class="hint">Ta propre estimation — augmentation moyenne, échelon, etc.</span></label>
+        <label><span data-i18n="lbl_salarygrowth">Croissance salariale estimée par année</span> <span class="hint" data-i18n="lbl_salarygrowth_hint">Ta propre estimation — augmentation moyenne, échelon, etc.</span></label>
         <div class="slider-row">
           <input type="range" id="salaryGrowth" min="0" max="8" step="0.5" value="2">
           <span class="slider-val" id="salaryGrowthVal">2 %</span>
@@ -210,7 +219,7 @@
       </div>
 
       <div class="field" style="margin-bottom:0;">
-        <label>Croissance du loyer si la tendance continue <span class="hint">Par défaut, le taux de référence officiel 2026</span></label>
+        <label><span data-i18n="lbl_rentgrowth">Croissance du loyer si la tendance continue</span> <span class="hint" data-i18n="lbl_rentgrowth_hint">Par défaut, le taux de référence officiel 2026</span></label>
         <div class="slider-row">
           <input type="range" id="rentGrowth" min="0" max="10" step="0.1" value="3.1">
           <span class="slider-val" id="rentGrowthVal">3.1 %</span>
@@ -218,34 +227,34 @@
       </div>
 
       <div class="ref-note">
-        <b>Taux de référence officiel 2026 :</b> 3,1 % (moyenne de l'inflation sur 3 ans), pour les baux renouvelés entre le 2 avril 2026 et le 1er avril 2027. Ce taux est une référence, pas un plafond — un propriétaire peut justifier plus avec de vraies dépenses (taxes, assurances, rénovations).
+        <span data-i18n-html="note_reftaux"><b>Taux de référence officiel 2026 :</b> 3,1 % (moyenne de l'inflation sur 3 ans), pour les baux renouvelés entre le 2 avril 2026 et le 1er avril 2027. Ce taux est une référence, pas un plafond — un propriétaire peut justifier plus avec de vraies dépenses (taxes, assurances, rénovations).</span>
       </div>
     </div>
 
     <div class="card">
-      <h2>Ton bail</h2>
+      <h2 data-i18n="h2_bail">Ton bail</h2>
 
       <div class="field">
-        <label for="leaseEnd">Date de fin de ton bail</label>
+        <label for="leaseEnd" data-i18n="lbl_leaseend">Date de fin de ton bail</label>
         <div class="input-row">
           <input type="date" id="leaseEnd">
         </div>
       </div>
 
       <div class="field" style="margin-bottom:0;">
-        <label for="leaseType">Type de bail</label>
+        <label for="leaseType" data-i18n="lbl_leasetype">Type de bail</label>
         <select id="leaseType" style="width:100%;font-family:'Inter',sans-serif;font-size:15px;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px 14px;outline:none;">
-          <option value="12plus">12 mois et plus</option>
-          <option value="12moins">Moins de 12 mois</option>
-          <option value="indetermine">Durée indéterminée</option>
-          <option value="chambre">Chambre</option>
+          <option value="12plus" data-i18n="opt_12plus">12 mois et plus</option>
+          <option value="12moins" data-i18n="opt_12moins">Moins de 12 mois</option>
+          <option value="indetermine" data-i18n="opt_indetermine">Durée indéterminée</option>
+          <option value="chambre" data-i18n="opt_chambre">Chambre</option>
         </select>
       </div>
 
       <div id="noticeWindowBox" class="ref-note" style="margin-top:1.25rem;"></div>
 
       <div class="field" style="margin-top:1.25rem;margin-bottom:0;">
-        <label for="noticeReceived">As-tu déjà reçu un avis du propriétaire? <span class="hint">Laisse vide si non</span></label>
+        <label for="noticeReceived"><span data-i18n="lbl_noticereceived">As-tu déjà reçu un avis du propriétaire?</span> <span class="hint" data-i18n="lbl_noticereceived_hint">Laisse vide si non</span></label>
         <div class="input-row">
           <input type="date" id="noticeReceived">
         </div>
@@ -253,12 +262,12 @@
 
       <div id="methodBox" class="ref-note" style="margin-top:1rem;display:none;"></div>
 
-      <button id="saveBtn" type="button" style="margin-top:1.25rem;width:100%;background:var(--teal);color:#fff;border:none;border-radius:8px;padding:12px;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;">Enregistrer mes informations</button>
+      <button id="saveBtn" type="button" style="margin-top:1.25rem;width:100%;background:var(--teal);color:#fff;border:none;border-radius:8px;padding:12px;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;" data-i18n="btn_save">Enregistrer mes informations</button>
       <div id="saveConfirm" style="text-align:center;font-size:12.5px;color:var(--teal-text);margin-top:8px;height:16px;"></div>
     </div>
 
     <div class="card">
-      <h2>Ce que ça donne</h2>
+      <h2 data-i18n="h2_resultat">Ce que ça donne</h2>
 
       <div id="signalBox" class="signal normal">
         <div class="signal-label" id="signalLabel">Dans la norme</div>
@@ -267,33 +276,33 @@
 
       <div class="stats">
         <div class="stat">
-          <div class="stat-label">Ton augmentation</div>
+          <div class="stat-label" data-i18n="stat_increase">Ton augmentation</div>
           <div class="stat-value" id="increasePercent">—</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Taux de référence</div>
+          <div class="stat-label" data-i18n="stat_ref">Taux de référence</div>
           <div class="stat-value" id="refPercent">3,1 %</div>
         </div>
       </div>
 
-      <div class="chart-title">Loyer vs. salaire, sur 5 ans</div>
+      <div class="chart-title" data-i18n="chart_title1">Loyer vs. salaire, sur 5 ans</div>
       <svg id="chart" viewBox="0 0 460 220"></svg>
       <div class="legend">
-        <span><span class="dot" style="background:#C9922E;"></span>% du salaire pour le loyer</span>
+        <span><span class="dot" style="background:#C9922E;"></span><span data-i18n="legend_pct">% du salaire pour le loyer</span></span>
       </div>
 
       <div class="stats" style="margin-top:1.25rem;">
         <div class="stat">
-          <div class="stat-label">Aujourd'hui</div>
+          <div class="stat-label" data-i18n="stat_today">Aujourd'hui</div>
           <div class="stat-value" id="pctNow">—</div>
         </div>
         <div class="stat">
-          <div class="stat-label">Dans 5 ans</div>
+          <div class="stat-label" data-i18n="stat_5years">Dans 5 ans</div>
           <div class="stat-value warn" id="pctFuture">—</div>
         </div>
       </div>
 
-      <div class="chart-title" style="margin-top:1.25rem;">Repère : la règle du 30 %</div>
+      <div class="chart-title" style="margin-top:1.25rem;" data-i18n="chart_title2">Repère : la règle du 30 %</div>
       <div style="background:var(--paper);border-radius:8px;height:14px;overflow:hidden;position:relative;">
         <div id="thirtyBar" style="height:100%;background:var(--teal);width:0%;transition:width .2s;"></div>
         <div style="position:absolute;top:0;bottom:0;left:30%;width:2px;background:var(--ink);"></div>
@@ -306,10 +315,10 @@
 
   <div id="page-logements" class="page">
     <select id="regionSelect" class="region-select">
-      <option value="joliette">Lanaudière / Joliette</option>
+      <option value="joliette" data-i18n="opt_joliette">Lanaudière / Joliette</option>
       <option value="montreal">Montréal</option>
       <option value="quebec">Québec</option>
-      <option value="gatineau">Gatineau / Outaouais</option>
+      <option value="gatineau" data-i18n="opt_gatineau">Gatineau / Outaouais</option>
       <option value="sherbrooke">Sherbrooke</option>
       <option value="troisrivieres">Trois-Rivières</option>
     </select>
@@ -318,59 +327,150 @@
 
     <div class="res-card" style="background:var(--paper);border:none;">
       <h3>Coopératives et OBNL — partout au Québec</h3>
-      <p>Contrairement aux HLM, il n'existe pas de guichet unique pour les coopératives et OBNL — il faut généralement contacter chaque organisme séparément. Ces deux ressources nationales peuvent t'aider à démarrer ta recherche, peu importe ta région :</p>
-      <p><a href="https://rqoh.com/" target="_blank" rel="noopener">Réseau québécois des OSBL d'habitation ↗</a></p>
-      <p><a href="https://www.habitation.gouv.qc.ca/" target="_blank" rel="noopener">Société d'habitation du Québec ↗</a> — pour trouver l'office d'habitation de ta municipalité si elle n'est pas listée ci-dessus</p>
+      <p data-i18n="coop_intro">Contrairement aux HLM, il n'existe pas de guichet unique pour les coopératives et OBNL — il faut généralement contacter chaque organisme séparément. Ces deux ressources nationales peuvent t'aider à démarrer ta recherche, peu importe ta région :</p>
+      <p><a href="https://rqoh.com/" target="_blank" rel="noopener" data-i18n="link_rqoh">Réseau québécois des OSBL d'habitation ↗</a></p>
+      <p><span data-i18n-html="link_shq_full"><a href="https://www.habitation.gouv.qc.ca/" target="_blank" rel="noopener">Société d'habitation du Québec ↗</a> — pour trouver l'office d'habitation de ta municipalité si elle n'est pas listée ci-dessus</span></p>
     </div>
   </div>
 
   <div id="page-guide" class="page">
     <div class="ref-note" style="margin-bottom:1.5rem;">
-      Tu viens de recevoir un avis d'augmentation de loyer? Voici les <b>3 vraies options légales</b> au Québec, selon le Code civil du Québec. Ce n'est pas un conseil juridique — pour ta situation précise, consulte <a href="https://educaloi.qc.ca/capsules/le-renouvellement-de-bail-et-la-hausse-de-loyer/" target="_blank" rel="noopener">Éducaloi ↗</a> ou le <a href="https://www.tal.gouv.qc.ca/" target="_blank" rel="noopener">TAL ↗</a>.
+      <span data-i18n-html="guide_intro">Tu viens de recevoir un avis d'augmentation de loyer? Voici les <b>3 vraies options légales</b> au Québec, selon le Code civil du Québec. Ce n'est pas un conseil juridique — pour ta situation précise, consulte <a href="https://educaloi.qc.ca/capsules/le-renouvellement-de-bail-et-la-hausse-de-loyer/" target="_blank" rel="noopener">Éducaloi ↗</a> ou le <a href="https://www.tal.gouv.qc.ca/" target="_blank" rel="noopener">TAL ↗</a>.</span>
     </div>
 
     <div class="option-card">
       <div class="option-num">1</div>
       <div>
-        <h3>Accepter (ou ne rien faire)</h3>
-        <p>Si tu ne réponds pas dans le mois suivant la réception de l'avis, ton bail est automatiquement renouvelé <b>avec les nouvelles conditions</b>, incluant l'augmentation proposée. C'est la voie la plus simple si l'augmentation te semble raisonnable.</p>
+        <h3 data-i18n="opt1_title">Accepter (ou ne rien faire)</h3>
+        <p data-i18n-html="opt1_text">Si tu ne réponds pas dans le mois suivant la réception de l'avis, ton bail est automatiquement renouvelé <b>avec les nouvelles conditions</b>, incluant l'augmentation proposée. C'est la voie la plus simple si l'augmentation te semble raisonnable.</p>
       </div>
     </div>
 
     <div class="option-card">
       <div class="option-num">2</div>
       <div>
-        <h3>Refuser, mais rester dans ton logement</h3>
-        <p>Tu as <b>1 mois</b> après avoir reçu l'avis pour envoyer un refus écrit à ton propriétaire. Ensuite, trois choses peuvent arriver :</p>
+        <h3 data-i18n="opt2_title">Refuser, mais rester dans ton logement</h3>
+        <div data-i18n-html="opt2_text"><p>Tu as <b>1 mois</b> après avoir reçu l'avis pour envoyer un refus écrit à ton propriétaire. Ensuite, trois choses peuvent arriver :</p>
         <ul>
           <li>Le propriétaire ne fait rien → ton bail est renouvelé aux <b>anciennes conditions</b> (sans l'augmentation)</li>
           <li>Vous négociez ensemble une entente à l'amiable</li>
           <li>Le propriétaire s'adresse au TAL (dans le mois suivant ton refus) pour qu'un juge tranche</li>
         </ul>
-        <p style="margin-top:8px;">Le TAL fournit un <a href="https://www.tal.gouv.qc.ca/sites/default/files/notices/TAL_806_E.pdf" target="_blank" rel="noopener">modèle d'avis de refus ↗</a> que tu peux utiliser.</p>
+        <p style="margin-top:8px;">Le TAL fournit un <a href="https://www.tal.gouv.qc.ca/sites/default/files/notices/TAL_806_E.pdf" target="_blank" rel="noopener">modèle d'avis de refus ↗</a> que tu peux utiliser.</p></div>
       </div>
     </div>
 
     <div class="option-card">
       <div class="option-num">3</div>
       <div>
-        <h3>Refuser et quitter le logement</h3>
-        <p>Si tu préfères déménager plutôt qu'accepter l'augmentation, envoie un <b>avis écrit de non-reconduction</b> à ton propriétaire, dans le même délai que la fenêtre légale d'avis (voir l'onglet Calculateur pour la tienne).</p>
+        <h3 data-i18n="opt3_title">Refuser et quitter le logement</h3>
+        <p data-i18n-html="opt3_text">Si tu préfères déménager plutôt qu'accepter l'augmentation, envoie un <b>avis écrit de non-reconduction</b> à ton propriétaire, dans le même délai que la fenêtre légale d'avis (voir l'onglet Calculateur pour la tienne).</p>
       </div>
     </div>
 
     <div class="ref-note" style="margin-top:1.5rem;">
-      <b>Bon à savoir :</b> aucune de ces trois options n'exige d'aller en cour immédiatement — la plupart des situations se règlent par la négociation directe ou simplement en laissant le bail se renouveler aux anciennes conditions si le propriétaire n'insiste pas.
+      <span data-i18n-html="guide_note"><b>Bon à savoir :</b> aucune de ces trois options n'exige d'aller en cour immédiatement — la plupart des situations se règlent par la négociation directe ou simplement en laissant le bail se renouveler aux anciennes conditions si le propriétaire n'insiste pas.</span>
     </div>
   </div>
 
-  <footer>
+  <footer data-i18n-html="footer_text">
     LoyerClair donne une estimation à titre indicatif seulement — ce n'est pas une décision légale. Pour une confirmation officielle de ta situation précise, utilise le <a href="https://www.tal.gouv.qc.ca/fr/calcul-pour-l-augmentation-de-loyer" target="_blank" rel="noopener">calculateur officiel du Tribunal administratif du logement</a>.
   </footer>
 
 </div>
 
 <script>
+var currentLang = localStorage.getItem('loyerclair_lang') || 'fr';
+
+var translations = {
+  fr: {
+    tagline: "Vois où ton loyer s'en va — et si ta hausse est dans la norme.",
+    tab_calc: 'Calculateur', tab_logements: 'Logements abordables', tab_guide: 'Que faire?',
+    h2_situation: 'Ta situation',
+    lbl_rent: 'Loyer actuel', lbl_increase: 'Augmentation proposée par le propriétaire',
+    lbl_salary: 'Ton salaire annuel',
+    lbl_salarygrowth: 'Croissance salariale estimée par année', lbl_salarygrowth_hint: 'Ta propre estimation — augmentation moyenne, échelon, etc.',
+    lbl_rentgrowth: 'Croissance du loyer si la tendance continue', lbl_rentgrowth_hint: 'Par défaut, le taux de référence officiel 2026',
+    h2_bail: 'Ton bail',
+    lbl_leaseend: 'Date de fin de ton bail', lbl_leasetype: 'Type de bail',
+    lbl_noticereceived: 'As-tu déjà reçu un avis du propriétaire?', lbl_noticereceived_hint: 'Laisse vide si non',
+    h2_resultat: 'Ce que ça donne',
+    opt_12plus: '12 mois et plus', opt_12moins: 'Moins de 12 mois', opt_indetermine: 'Durée indéterminée', opt_chambre: 'Chambre',
+    stat_increase: 'Ton augmentation', stat_ref: 'Taux de référence',
+    chart_title1: 'Loyer vs. salaire, sur 5 ans', stat_today: "Aujourd'hui", stat_5years: 'Dans 5 ans',
+    chart_title2: 'Repère : la règle du 30 %',
+    note_reftaux: '<b>Taux de référence officiel 2026 :</b> 3,1 % (moyenne de l\'inflation sur 3 ans), pour les baux renouvelés entre le 2 avril 2026 et le 1er avril 2027. Ce taux est une référence, pas un plafond — un propriétaire peut justifier plus avec de vraies dépenses (taxes, assurances, rénovations).',
+    btn_save: 'Enregistrer mes informations',
+    legend_pct: '% du salaire pour le loyer',
+    opt_joliette: 'Lanaudière / Joliette', opt_gatineau: 'Gatineau / Outaouais',
+    coop_intro: "Contrairement aux HLM, il n'existe pas de guichet unique pour les coopératives et OBNL — il faut généralement contacter chaque organisme séparément. Ces deux ressources nationales peuvent t'aider à démarrer ta recherche, peu importe ta région :",
+    link_rqoh: "Réseau québécois des OSBL d'habitation ↗",
+    link_shq_full: '<a href="https://www.habitation.gouv.qc.ca/" target="_blank" rel="noopener">Société d\'habitation du Québec ↗</a> — pour trouver l\'office d\'habitation de ta municipalité si elle n\'est pas listée ci-dessus',
+    guide_intro: 'Tu viens de recevoir un avis d\'augmentation de loyer? Voici les <b>3 vraies options légales</b> au Québec, selon le Code civil du Québec. Ce n\'est pas un conseil juridique — pour ta situation précise, consulte <a href="https://educaloi.qc.ca/capsules/le-renouvellement-de-bail-et-la-hausse-de-loyer/" target="_blank" rel="noopener">Éducaloi ↗</a> ou le <a href="https://www.tal.gouv.qc.ca/" target="_blank" rel="noopener">TAL ↗</a>.',
+    opt1_title: 'Accepter (ou ne rien faire)', opt2_title: 'Refuser, mais rester dans ton logement', opt3_title: 'Refuser et quitter le logement',
+    opt1_text: 'Si tu ne réponds pas dans le mois suivant la réception de l\'avis, ton bail est automatiquement renouvelé <b>avec les nouvelles conditions</b>, incluant l\'augmentation proposée. C\'est la voie la plus simple si l\'augmentation te semble raisonnable.',
+    opt2_text: '<p>Tu as <b>1 mois</b> après avoir reçu l\'avis pour envoyer un refus écrit à ton propriétaire. Ensuite, trois choses peuvent arriver :</p><ul><li>Le propriétaire ne fait rien → ton bail est renouvelé aux <b>anciennes conditions</b> (sans l\'augmentation)</li><li>Vous négociez ensemble une entente à l\'amiable</li><li>Le propriétaire s\'adresse au TAL (dans le mois suivant ton refus) pour qu\'un juge tranche</li></ul><p style="margin-top:8px;">Le TAL fournit un <a href="https://www.tal.gouv.qc.ca/sites/default/files/notices/TAL_806_E.pdf" target="_blank" rel="noopener">modèle d\'avis de refus ↗</a> que tu peux utiliser.</p>',
+    opt3_text: 'Si tu préfères déménager plutôt qu\'accepter l\'augmentation, envoie un <b>avis écrit de non-reconduction</b> à ton propriétaire, dans le même délai que la fenêtre légale d\'avis (voir l\'onglet Calculateur pour la tienne).',
+    guide_note: '<b>Bon à savoir :</b> aucune de ces trois options n\'exige d\'aller en cour immédiatement — la plupart des situations se règlent par la négociation directe ou simplement en laissant le bail se renouveler aux anciennes conditions si le propriétaire n\'insiste pas.',
+    footer_text: 'LoyerClair donne une estimation à titre indicatif seulement — ce n\'est pas une décision légale. Pour une confirmation officielle de ta situation précise, utilise le <a href="https://www.tal.gouv.qc.ca/fr/calcul-pour-l-augmentation-de-loyer" target="_blank" rel="noopener">calculateur officiel du Tribunal administratif du logement</a>.',
+  },
+  en: {
+    tagline: 'See where your rent is going — and if your increase is within the norm.',
+    tab_calc: 'Calculator', tab_logements: 'Affordable housing', tab_guide: 'What to do?',
+    h2_situation: 'Your situation',
+    lbl_rent: 'Current rent', lbl_increase: 'Increase proposed by the landlord',
+    lbl_salary: 'Your annual salary',
+    lbl_salarygrowth: 'Estimated salary growth per year', lbl_salarygrowth_hint: 'Your own estimate — average raise, step increase, etc.',
+    lbl_rentgrowth: 'Rent growth if the trend continues', lbl_rentgrowth_hint: 'Defaults to the official 2026 reference rate',
+    h2_bail: 'Your lease',
+    lbl_leaseend: 'Your lease end date', lbl_leasetype: 'Lease type',
+    lbl_noticereceived: 'Have you already received a notice from your landlord?', lbl_noticereceived_hint: 'Leave blank if not',
+    h2_resultat: 'What this shows',
+    opt_12plus: '12 months or more', opt_12moins: 'Less than 12 months', opt_indetermine: 'Indeterminate term', opt_chambre: 'Room',
+    stat_increase: 'Your increase', stat_ref: 'Reference rate',
+    chart_title1: 'Rent vs. salary, over 5 years', stat_today: 'Today', stat_5years: 'In 5 years',
+    chart_title2: 'Benchmark: the 30% rule',
+    note_reftaux: '<b>Official 2026 reference rate:</b> 3.1% (average of 3-year inflation), for leases renewed between April 2, 2026 and April 1, 2027. This rate is a reference, not a cap — a landlord can justify more with real expenses (taxes, insurance, renovations).',
+    btn_save: 'Save my information',
+    legend_pct: '% of salary going to rent',
+    opt_joliette: 'Lanaudière / Joliette', opt_gatineau: 'Gatineau / Outaouais',
+    coop_intro: "Unlike HLM, there's no single point of entry for co-ops and non-profits — you generally need to contact each organization separately. These two national resources can help you start your search, wherever you are:",
+    link_rqoh: 'Quebec network of non-profit housing organizations ↗',
+    link_shq_full: '<a href="https://www.habitation.gouv.qc.ca/" target="_blank" rel="noopener">Société d\'habitation du Québec ↗</a> — to find the housing office for your municipality if it\'s not listed above',
+    guide_intro: 'Did you just receive a rent increase notice? Here are the <b>3 real legal options</b> in Quebec, under the Civil Code. This isn\'t legal advice — for your specific situation, consult <a href="https://educaloi.qc.ca/capsules/le-renouvellement-de-bail-et-la-hausse-de-loyer/" target="_blank" rel="noopener">Éducaloi ↗</a> or the <a href="https://www.tal.gouv.qc.ca/" target="_blank" rel="noopener">TAL ↗</a>.',
+    opt1_title: 'Accept (or do nothing)', opt2_title: 'Refuse, but stay in your home', opt3_title: 'Refuse and leave',
+    opt1_text: 'If you don\'t respond within a month of receiving the notice, your lease is automatically renewed <b>with the new conditions</b>, including the proposed increase. This is the simplest path if the increase seems reasonable.',
+    opt2_text: '<p>You have <b>1 month</b> after receiving the notice to send a written refusal to your landlord. From there, three things can happen:</p><ul><li>The landlord does nothing → your lease renews at the <b>old conditions</b> (no increase)</li><li>You negotiate an amicable agreement together</li><li>The landlord applies to the TAL (within a month of your refusal) to have a judge decide</li></ul><p style="margin-top:8px;">The TAL provides a <a href="https://www.tal.gouv.qc.ca/sites/default/files/notices/TAL_806_E.pdf" target="_blank" rel="noopener">refusal notice template ↗</a> you can use.</p>',
+    opt3_text: 'If you\'d rather move than accept the increase, send a <b>written non-renewal notice</b> to your landlord, within the same window as the legal notice period (see the Calculator tab for yours).',
+    guide_note: '<b>Good to know:</b> none of these three options require going to court right away — most situations are resolved through direct negotiation, or simply by letting the lease renew at the old conditions if the landlord doesn\'t press the issue.',
+    footer_text: 'LoyerClair gives an estimate for informational purposes only — this is not a legal determination. For an official confirmation of your specific situation, use the <a href="https://www.tal.gouv.qc.ca/fr/calcul-pour-l-augmentation-de-loyer" target="_blank" rel="noopener">official Tribunal administratif du logement calculator</a>.',
+  }
+};
+
+function t(key){
+  return (translations[currentLang] && translations[currentLang][key]) || (translations.fr && translations.fr[key]) || key;
+}
+
+function applyTranslations(){
+  document.querySelectorAll('[data-i18n]').forEach(function(el){
+    el.textContent = t(el.getAttribute('data-i18n'));
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(function(el){
+    el.innerHTML = t(el.getAttribute('data-i18n-html'));
+  });
+}
+
+function setLang(lang){
+  currentLang = lang;
+  localStorage.setItem('loyerclair_lang', lang);
+  document.getElementById('lang-fr').classList.toggle('active', lang === 'fr');
+  document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+  applyTranslations();
+  updateNoticeWindow();
+  updateMethodBox();
+  renderRegion();
+}
+
 function fmtPct(n){ return n.toLocaleString('fr-CA',{minimumFractionDigits:1,maximumFractionDigits:1}) + ' %'; }
 function fmtMoney(n){ return Math.round(n).toLocaleString('fr-CA') + ' $'; }
 
@@ -404,22 +504,25 @@ var els = {
 var REF_RATE = 3.1;
 
 var NOTICE_WINDOWS = {
-  '12plus': {minMonths:6, maxMonths:3, label:'entre 3 et 6 mois avant la fin du bail'},
-  '12moins': {minMonths:2, maxMonths:1, label:'entre 1 et 2 mois avant la fin du bail'},
-  'indetermine': {minMonths:2, maxMonths:1, label:'entre 1 et 2 mois avant la modification demandée'},
-  'chambre': {minDays:20, maxDays:10, label:'entre 10 et 20 jours avant la fin du bail'}
+  '12plus': {minMonths:6, maxMonths:3, label:{fr:'entre 3 et 6 mois avant la fin du bail', en:'between 3 and 6 months before the lease ends'}},
+  '12moins': {minMonths:2, maxMonths:1, label:{fr:'entre 1 et 2 mois avant la fin du bail', en:'between 1 and 2 months before the lease ends'}},
+  'indetermine': {minMonths:2, maxMonths:1, label:{fr:'entre 1 et 2 mois avant la modification demandée', en:'between 1 and 2 months before the requested change'}},
+  'chambre': {minDays:20, maxDays:10, label:{fr:'entre 10 et 20 jours avant la fin du bail', en:'between 10 and 20 days before the lease ends'}}
 };
 
 function addMonths(date, n){ var d = new Date(date); d.setMonth(d.getMonth()+n); return d; }
 function addDays(date, n){ var d = new Date(date); d.setDate(d.getDate()+n); return d; }
-function fmtDate(d){ return d.toLocaleDateString('fr-CA', {year:'numeric', month:'long', day:'numeric'}); }
+function fmtDate(d){ return d.toLocaleDateString(currentLang === 'en' ? 'en-CA' : 'fr-CA', {year:'numeric', month:'long', day:'numeric'}); }
 function daysUntil(d){ return Math.ceil((d - new Date()) / (1000*60*60*24)); }
 
 function updateNoticeWindow(){
   var leaseEndVal = els.leaseEnd.value;
   var type = els.leaseType.value;
+  var fr = currentLang !== 'en';
   if(!leaseEndVal){
-    els.noticeWindowBox.innerHTML = 'Entre ta date de fin de bail pour voir la fenêtre où ton propriétaire devrait t\'envoyer un avis, selon les vrais délais légaux du Québec.';
+    els.noticeWindowBox.innerHTML = fr
+      ? 'Entre ta date de fin de bail pour voir la fenêtre où ton propriétaire devrait t\'envoyer un avis, selon les vrais délais légaux du Québec.'
+      : 'Enter your lease end date to see the window during which your landlord should send you a notice, based on the real legal deadlines in Quebec.';
     return;
   }
   var leaseEnd = new Date(leaseEndVal + 'T00:00:00');
@@ -433,17 +536,25 @@ function updateNoticeWindow(){
     end = addMonths(leaseEnd, -cfg.maxMonths);
   }
   var days = daysUntil(start);
-  var msg = '<b>Fenêtre légale d\'avis :</b> ' + cfg.label + ' — soit entre le <b>' + fmtDate(start) + '</b> et le <b>' + fmtDate(end) + '</b>.';
+  var label = fr ? cfg.label.fr : cfg.label.en;
+  var msg = fr
+    ? ('<b>Fenêtre légale d\'avis :</b> ' + label + ' — soit entre le <b>' + fmtDate(start) + '</b> et le <b>' + fmtDate(end) + '</b>.')
+    : ('<b>Legal notice window:</b> ' + label + ' — that is, between <b>' + fmtDate(start) + '</b> and <b>' + fmtDate(end) + '</b>.');
   if(days > 0 && days <= 30){
-    msg = '<b>⏰ Approche bientôt :</b> ' + msg + ' Ça commence dans ' + days + ' jour' + (days>1?'s':'') + '.';
+    msg = fr
+      ? ('<b>⏰ Bientôt :</b> ' + msg + ' Ça commence dans ' + days + ' jour' + (days>1?'s':'') + '.')
+      : ('<b>⏰ Coming up soon:</b> ' + msg + ' It starts in ' + days + ' day' + (days>1?'s':'') + '.');
   } else if(days <= 0 && new Date() <= end){
-    msg = '<b>📬 Fenêtre active maintenant :</b> ' + msg + ' Garde un œil sur ton courrier.';
+    msg = fr
+      ? ('<b>📬 Fenêtre active maintenant :</b> ' + msg + ' Garde un œil sur ton courrier.')
+      : ('<b>📬 Window active now:</b> ' + msg + ' Keep an eye on your mail.');
   }
   els.noticeWindowBox.innerHTML = msg;
 }
 
 function updateMethodBox(){
   var val = els.noticeReceived.value;
+  var fr = currentLang !== 'en';
   if(!val){
     els.methodBox.style.display = 'none';
     return;
@@ -455,16 +566,24 @@ function updateMethodBox(){
 
   var methodMsg;
   if(received >= threshold){
-    methodMsg = 'Ton avis a été donné <b>après le 1er janvier 2026</b> — la nouvelle méthode de calcul s\'applique (taux de référence 3,1 % pour 2026-2027).';
+    methodMsg = fr
+      ? 'Ton avis a été donné <b>après le 1er janvier 2026</b> — la nouvelle méthode de calcul s\'applique (taux de référence 3,1 % pour 2026-2027).'
+      : 'Your notice was given <b>after January 1, 2026</b> — the new calculation method applies (3.1% reference rate for 2026-2027).';
   } else {
-    methodMsg = 'Ton avis a été donné <b>avant le 1er janvier 2026</b> — l\'ancienne méthode de calcul s\'applique. Vérifie avec le calculateur officiel du TAL pour ton cas précis.';
+    methodMsg = fr
+      ? 'Ton avis a été donné <b>avant le 1er janvier 2026</b> — l\'ancienne méthode de calcul s\'applique. Vérifie avec le calculateur officiel du TAL pour ton cas précis.'
+      : 'Your notice was given <b>before January 1, 2026</b> — the old calculation method applies. Check with the official TAL calculator for your specific case.';
   }
 
   var deadlineMsg;
   if(daysLeft > 0){
-    deadlineMsg = ' Tu as jusqu\'au <b>' + fmtDate(responseDeadline) + '</b> pour répondre si tu refuses l\'augmentation — soit ' + daysLeft + ' jour' + (daysLeft>1?'s':'') + ' restant' + (daysLeft>1?'s':'') + '.';
+    deadlineMsg = fr
+      ? (' Tu as jusqu\'au <b>' + fmtDate(responseDeadline) + '</b> pour répondre si tu refuses l\'augmentation — soit ' + daysLeft + ' jour' + (daysLeft>1?'s':'') + ' restant' + (daysLeft>1?'s':'') + '.')
+      : (' You have until <b>' + fmtDate(responseDeadline) + '</b> to respond if you refuse the increase — that\'s ' + daysLeft + ' day' + (daysLeft>1?'s':'') + ' left.');
   } else {
-    deadlineMsg = ' Le délai pour répondre (1 mois après réception) est déjà passé — sans réponse, le bail est renouvelé aux nouvelles conditions.';
+    deadlineMsg = fr
+      ? ' Le délai pour répondre (1 mois après réception) est déjà passé — sans réponse, le bail est renouvelé aux nouvelles conditions.'
+      : ' The response deadline (1 month after receipt) has already passed — without a response, the lease is renewed under the new conditions.';
   }
 
   els.methodBox.style.display = 'block';
@@ -498,11 +617,16 @@ function updateThirtyRule(pctNow){
   var barWidth = Math.min(pctNow / 30 * 100, 100);
   els.thirtyBar.style.width = barWidth + '%';
   els.thirtyBar.style.background = pctNow > 30 ? '#C9922E' : '#3F7D6E';
+  var fr = currentLang !== 'en';
 
   if(pctNow <= 30){
-    els.thirtyText.innerHTML = 'Ton loyer prend <b>' + fmtPct(pctNow) + '</b> de ton salaire — sous le repère classique de 30 % recommandé pour le logement.';
+    els.thirtyText.innerHTML = fr
+      ? ('Ton loyer prend <b>' + fmtPct(pctNow) + '</b> de ton salaire — sous le repère classique de 30 % recommandé pour le logement.')
+      : ('Your rent takes up <b>' + fmtPct(pctNow) + '</b> of your salary — below the classic 30% benchmark recommended for housing.');
   } else {
-    els.thirtyText.innerHTML = 'Ton loyer prend <b>' + fmtPct(pctNow) + '</b> de ton salaire — au-dessus du repère classique de 30 % recommandé pour le logement. Tu n\'es pas seul — beaucoup de ménages dépassent ce seuil dans le contexte actuel.';
+    els.thirtyText.innerHTML = fr
+      ? ('Ton loyer prend <b>' + fmtPct(pctNow) + '</b> de ton salaire — au-dessus du repère classique de 30 % recommandé pour le logement. Tu n\'es pas seul — beaucoup de ménages dépassent ce seuil dans le contexte actuel.')
+      : ('Your rent takes up <b>' + fmtPct(pctNow) + '</b> of your salary — above the classic 30% benchmark recommended for housing. You\'re not alone — many households exceed this threshold in the current context.');
   }
 }
 
@@ -612,18 +736,27 @@ var REGIONS = {
     hlm: {
       verified: true,
       name: 'Office municipal d\'habitation de Joliette',
-      details: '430, rue de Lanaudière, bureau 106, Joliette, QC J6E 7X1<br>Lundi au jeudi, 8h30-12h et 13h15-17h',
+      details: {
+        fr: '430, rue de Lanaudière, bureau 106, Joliette, QC J6E 7X1<br>Lundi au jeudi, 8h30-12h et 13h15-17h',
+        en: '430 rue de Lanaudière, suite 106, Joliette, QC J6E 7X1<br>Monday to Thursday, 8:30am-12pm and 1:15-5pm'
+      },
       link: 'https://www.omhjoliette.com/demande-de-logement/soumettre-une-demande'
     },
     coop: {
       verified: true,
       name: 'Bureau régional Laurentides-Lanaudière (coopératives)',
-      details: 'Téléphone : 450-759-8423<br>Courriel : lanaudiere-laurentides@cdrq.coop',
+      details: {
+        fr: 'Téléphone : 450-759-8423<br>Courriel : lanaudiere-laurentides@cdrq.coop',
+        en: 'Phone: 450-759-8423<br>Email: lanaudiere-laurentides@cdrq.coop'
+      },
       link: null
     },
     extra: {
       name: 'Action-Logement Lanaudière',
-      details: 'Aide à la recherche de logement pour toute la région. Téléphone : 450-394-1778',
+      details: {
+        fr: 'Aide à la recherche de logement pour toute la région. Téléphone : 450-394-1778',
+        en: 'Housing search help for the whole region. Phone: 450-394-1778'
+      },
       link: 'https://www.logementlanaudiere.org/'
     }
   },
@@ -631,13 +764,16 @@ var REGIONS = {
     hlm: {
       verified: true,
       name: 'Office municipal d\'habitation de Montréal (OMHM)',
-      details: 'Téléphone : 514-483-4118',
+      details: { fr: 'Téléphone : 514-483-4118', en: 'Phone: 514-483-4118' },
       link: 'https://www.omhm.qc.ca/fr/soumettre-une-demande'
     },
     coop: {
       verified: true,
       name: 'FECHIMM (Fédération des coopératives d\'habitation)',
-      details: 'Téléphone : 514-843-6929<br>Courriel : info@fechimm.coop<br>Liste commune pour plusieurs coopératives membres',
+      details: {
+        fr: 'Téléphone : 514-843-6929<br>Courriel : info@fechimm.coop<br>Liste commune pour plusieurs coopératives membres',
+        en: 'Phone: 514-843-6929<br>Email: info@fechimm.coop<br>Shared waitlist for several member co-ops'
+      },
       link: 'https://www.fechimm.coop/fr/cooperatives'
     }
   },
@@ -645,13 +781,19 @@ var REGIONS = {
     hlm: {
       verified: true,
       name: 'Registre partagé pour le logement subventionné à Québec',
-      details: 'Portail unique qui couvre HLM, coopératives et OBNL en même temps pour l\'agglomération de Québec — soumets une seule demande électronique.',
+      details: {
+        fr: 'Portail unique qui couvre HLM, coopératives et OBNL en même temps pour l\'agglomération de Québec — soumets une seule demande électronique.',
+        en: 'A single portal covering HLM, co-ops and non-profits together for the Quebec City area — submit one electronic application.'
+      },
       link: 'https://www.registrepartage.com/'
     },
     coop: {
       verified: true,
       name: 'Fédération des coopératives d\'habitation de Québec, Chaudière-Appalaches',
-      details: 'Gère aussi une liste d\'attente commune à plusieurs coopératives membres.',
+      details: {
+        fr: 'Gère aussi une liste d\'attente commune à plusieurs coopératives membres.',
+        en: 'Also manages a shared waitlist for several member co-ops.'
+      },
       link: null
     }
   },
@@ -659,7 +801,10 @@ var REGIONS = {
     hlm: {
       verified: false,
       name: 'Office d\'Habitation de l\'Outaouais',
-      details: 'Cet office dessert Gatineau et la région de l\'Outaouais. Coordonnées précises pas encore confirmées ici — utilise le lien ci-dessous pour les trouver directement.',
+      details: {
+        fr: 'Cet office dessert Gatineau et la région de l\'Outaouais. Coordonnées précises pas encore confirmées ici — utilise le lien ci-dessous pour les trouver directement.',
+        en: 'This office serves Gatineau and the Outaouais region. Exact contact details not yet confirmed here — use the link below to find them directly.'
+      },
       link: 'https://www.habitation.gouv.qc.ca/'
     }
   },
@@ -667,7 +812,10 @@ var REGIONS = {
     hlm: {
       verified: false,
       name: 'Office d\'habitation de Sherbrooke',
-      details: 'Coordonnées précises pas encore confirmées ici — utilise le lien ci-dessous pour les trouver directement.',
+      details: {
+        fr: 'Coordonnées précises pas encore confirmées ici — utilise le lien ci-dessous pour les trouver directement.',
+        en: 'Exact contact details not yet confirmed here — use the link below to find them directly.'
+      },
       link: 'https://www.habitation.gouv.qc.ca/'
     }
   },
@@ -675,7 +823,10 @@ var REGIONS = {
     hlm: {
       verified: false,
       name: 'Office d\'habitation de Trois-Rivières',
-      details: 'Coordonnées précises pas encore confirmées ici — utilise le lien ci-dessous pour les trouver directement.',
+      details: {
+        fr: 'Coordonnées précises pas encore confirmées ici — utilise le lien ci-dessous pour les trouver directement.',
+        en: 'Exact contact details not yet confirmed here — use the link below to find them directly.'
+      },
       link: 'https://www.habitation.gouv.qc.ca/'
     }
   }
@@ -683,21 +834,25 @@ var REGIONS = {
 
 function renderRegion(){
   var region = REGIONS[document.getElementById('regionSelect').value];
+  var fr = currentLang !== 'en';
   var html = '';
   ['hlm','coop','extra'].forEach(function(key){
     var r = region[key];
     if(!r) return;
     html += '<div class="res-card">';
-    html += '<span class="' + (r.verified === false ? 'unverified' : 'verified') + '">' + (r.verified === false ? 'À confirmer' : 'Vérifié') + '</span>';
+    html += '<span class="' + (r.verified === false ? 'unverified' : 'verified') + '">' + (r.verified === false ? (fr?'À confirmer':'To confirm') : (fr?'Vérifié':'Verified')) + '</span>';
     html += '<h3>' + r.name + '</h3>';
-    html += '<p>' + r.details + '</p>';
-    if(r.link) html += '<p><a href="' + r.link + '" target="_blank" rel="noopener">Visiter le site ↗</a></p>';
+    html += '<p>' + (fr ? r.details.fr : r.details.en) + '</p>';
+    if(r.link) html += '<p><a href="' + r.link + '" target="_blank" rel="noopener">' + (fr?'Visiter le site ↗':'Visit the site ↗') + '</a></p>';
     html += '</div>';
   });
   document.getElementById('regionContent').innerHTML = html;
 }
 
 document.getElementById('regionSelect').addEventListener('change', renderRegion);
+applyTranslations();
+document.getElementById('lang-' + currentLang).classList.add('active');
+document.getElementById('lang-' + (currentLang === 'fr' ? 'en' : 'fr')).classList.remove('active');
 renderRegion();
 </script>
 </body>
