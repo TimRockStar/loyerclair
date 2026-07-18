@@ -35,7 +35,8 @@
   .word span{color:var(--teal);}
   .tagline{font-size:15px;color:var(--sub);margin-top:6px;max-width:520px;}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
-  @media(max-width:760px){.grid{grid-template-columns:1fr;}}
+  .grid .card:last-child{grid-column:1 / -1;}
+  @media(max-width:760px){.grid{grid-template-columns:1fr;}.grid .card:last-child{grid-column:1;}}
   .card{
     background:var(--card);
     border:1px solid var(--line);
@@ -184,6 +185,38 @@
     </div>
 
     <div class="card">
+      <h2>Ton bail</h2>
+
+      <div class="field">
+        <label for="leaseEnd">Date de fin de ton bail</label>
+        <div class="input-row">
+          <input type="date" id="leaseEnd">
+        </div>
+      </div>
+
+      <div class="field" style="margin-bottom:0;">
+        <label for="leaseType">Type de bail</label>
+        <select id="leaseType" style="width:100%;font-family:'Inter',sans-serif;font-size:15px;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px 14px;outline:none;">
+          <option value="12plus">12 mois et plus</option>
+          <option value="12moins">Moins de 12 mois</option>
+          <option value="indetermine">Durée indéterminée</option>
+          <option value="chambre">Chambre</option>
+        </select>
+      </div>
+
+      <div id="noticeWindowBox" class="ref-note" style="margin-top:1.25rem;"></div>
+
+      <div class="field" style="margin-top:1.25rem;margin-bottom:0;">
+        <label for="noticeReceived">As-tu déjà reçu un avis du propriétaire? <span class="hint">Laisse vide si non</span></label>
+        <div class="input-row">
+          <input type="date" id="noticeReceived">
+        </div>
+      </div>
+
+      <div id="methodBox" class="ref-note" style="margin-top:1rem;display:none;"></div>
+    </div>
+
+    <div class="card">
       <h2>Ce que ça donne</h2>
 
       <div id="signalBox" class="signal normal">
@@ -247,10 +280,106 @@ var els = {
   refPercent: document.getElementById('refPercent'),
   pctNow: document.getElementById('pctNow'),
   pctFuture: document.getElementById('pctFuture'),
-  chart: document.getElementById('chart')
+  chart: document.getElementById('chart'),
+  leaseEnd: document.getElementById('leaseEnd'),
+  leaseType: document.getElementById('leaseType'),
+  noticeWindowBox: document.getElementById('noticeWindowBox'),
+  noticeReceived: document.getElementById('noticeReceived'),
+  methodBox: document.getElementById('methodBox')
 };
 
 var REF_RATE = 3.1;
+
+var NOTICE_WINDOWS = {
+  '12plus': {minMonths:6, maxMonths:3, label:'entre 3 et 6 mois avant la fin du bail'},
+  '12moins': {minMonths:2, maxMonths:1, label:'entre 1 et 2 mois avant la fin du bail'},
+  'indetermine': {minMonths:2, maxMonths:1, label:'entre 1 et 2 mois avant la modification demandée'},
+  'chambre': {minDays:20, maxDays:10, label:'entre 10 et 20 jours avant la fin du bail'}
+};
+
+function addMonths(date, n){ var d = new Date(date); d.setMonth(d.getMonth()+n); return d; }
+function addDays(date, n){ var d = new Date(date); d.setDate(d.getDate()+n); return d; }
+function fmtDate(d){ return d.toLocaleDateString('fr-CA', {year:'numeric', month:'long', day:'numeric'}); }
+function daysUntil(d){ return Math.ceil((d - new Date()) / (1000*60*60*24)); }
+
+function updateNoticeWindow(){
+  var leaseEndVal = els.leaseEnd.value;
+  var type = els.leaseType.value;
+  if(!leaseEndVal){
+    els.noticeWindowBox.innerHTML = 'Entre ta date de fin de bail pour voir la fenêtre où ton propriétaire devrait t\'envoyer un avis, selon les vrais délais légaux du Québec.';
+    return;
+  }
+  var leaseEnd = new Date(leaseEndVal + 'T00:00:00');
+  var cfg = NOTICE_WINDOWS[type];
+  var start, end;
+  if(cfg.minDays){
+    start = addDays(leaseEnd, -cfg.minDays);
+    end = addDays(leaseEnd, -cfg.maxDays);
+  } else {
+    start = addMonths(leaseEnd, -cfg.minMonths);
+    end = addMonths(leaseEnd, -cfg.maxMonths);
+  }
+  var days = daysUntil(start);
+  var msg = '<b>Fenêtre légale d\'avis :</b> ' + cfg.label + ' — soit entre le <b>' + fmtDate(start) + '</b> et le <b>' + fmtDate(end) + '</b>.';
+  if(days > 0 && days <= 30){
+    msg = '<b>⏰ Approche bientôt :</b> ' + msg + ' Ça commence dans ' + days + ' jour' + (days>1?'s':'') + '.';
+  } else if(days <= 0 && new Date() <= end){
+    msg = '<b>📬 Fenêtre active maintenant :</b> ' + msg + ' Garde un œil sur ton courrier.';
+  }
+  els.noticeWindowBox.innerHTML = msg;
+}
+
+function updateMethodBox(){
+  var val = els.noticeReceived.value;
+  if(!val){
+    els.methodBox.style.display = 'none';
+    return;
+  }
+  var received = new Date(val + 'T00:00:00');
+  var threshold = new Date('2026-01-01T00:00:00');
+  var responseDeadline = addMonths(received, 1);
+  var daysLeft = daysUntil(responseDeadline);
+
+  var methodMsg;
+  if(received >= threshold){
+    methodMsg = 'Ton avis a été donné <b>après le 1er janvier 2026</b> — la nouvelle méthode de calcul s\'applique (taux de référence 3,1 % pour 2026-2027).';
+  } else {
+    methodMsg = 'Ton avis a été donné <b>avant le 1er janvier 2026</b> — l\'ancienne méthode de calcul s\'applique. Vérifie avec le calculateur officiel du TAL pour ton cas précis.';
+  }
+
+  var deadlineMsg;
+  if(daysLeft > 0){
+    deadlineMsg = ' Tu as jusqu\'au <b>' + fmtDate(responseDeadline) + '</b> pour répondre si tu refuses l\'augmentation — soit ' + daysLeft + ' jour' + (daysLeft>1?'s':'') + ' restant' + (daysLeft>1?'s':'') + '.';
+  } else {
+    deadlineMsg = ' Le délai pour répondre (1 mois après réception) est déjà passé — sans réponse, le bail est renouvelé aux nouvelles conditions.';
+  }
+
+  els.methodBox.style.display = 'block';
+  els.methodBox.innerHTML = methodMsg + deadlineMsg;
+}
+
+function saveInputs(){
+  var data = {
+    rent: els.rent.value, increase: els.increase.value, salary: els.salary.value,
+    salaryGrowth: els.salaryGrowth.value, rentGrowth: els.rentGrowth.value,
+    leaseEnd: els.leaseEnd.value, leaseType: els.leaseType.value, noticeReceived: els.noticeReceived.value
+  };
+  localStorage.setItem('loyerclair_data', JSON.stringify(data));
+}
+
+function loadInputs(){
+  try {
+    var data = JSON.parse(localStorage.getItem('loyerclair_data') || '{}');
+    if(data.rent) els.rent.value = data.rent;
+    if(data.increase) els.increase.value = data.increase;
+    if(data.salary) els.salary.value = data.salary;
+    if(data.salaryGrowth) els.salaryGrowth.value = data.salaryGrowth;
+    if(data.rentGrowth) els.rentGrowth.value = data.rentGrowth;
+    if(data.leaseEnd) els.leaseEnd.value = data.leaseEnd;
+    if(data.leaseType) els.leaseType.value = data.leaseType;
+    if(data.noticeReceived) els.noticeReceived.value = data.noticeReceived;
+  } catch(e){}
+}
 
 function recalc(){
   var rent = parseFloat(els.rent.value) || 0;
@@ -286,6 +415,9 @@ function recalc(){
   els.pctFuture.textContent = fmtPct(pctData[5]);
 
   drawChart(pctData);
+  updateNoticeWindow();
+  updateMethodBox();
+  saveInputs();
 }
 
 function drawChart(data){
@@ -326,10 +458,12 @@ function drawChart(data){
     xLabels;
 }
 
-[els.rent, els.increase, els.salary, els.salaryGrowth, els.rentGrowth].forEach(function(el){
+[els.rent, els.increase, els.salary, els.salaryGrowth, els.rentGrowth, els.leaseEnd, els.leaseType, els.noticeReceived].forEach(function(el){
   el.addEventListener('input', recalc);
+  el.addEventListener('change', recalc);
 });
 
+loadInputs();
 recalc();
 </script>
 </body>
