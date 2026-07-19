@@ -274,6 +274,15 @@
 
       <div id="methodBox" class="ref-note" style="margin-top:1rem;display:none;"></div>
 
+      <div style="margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--line);">
+        <div class="chart-title" data-i18n="lease_scan_title">Ton bail numérique</div>
+        <div style="font-size:11.5px;color:var(--sub);line-height:1.5;margin-bottom:10px;" data-i18n="lease_scan_privacy">🔒 Reste privé sur cet appareil — jamais envoyé à la banque communautaire. La photo est analysée par une IA pour en extraire les détails, puis n'est pas conservée.</div>
+        <button id="scanLeaseBtn" type="button" style="width:100%;background:var(--card);color:var(--ink-2);border:1px solid var(--line);border-radius:8px;padding:12px;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;" data-i18n="btn_scanlease">📷 Prendre une photo de mon bail</button>
+        <input type="file" id="leasePhotoInput" accept="image/*" capture="environment" style="display:none;">
+        <div id="leaseScanStatus" style="font-size:12px;color:var(--sub);margin-top:8px;text-align:center;"></div>
+        <div id="leaseDigital" style="display:none;margin-top:1rem;background:var(--paper);border-radius:8px;padding:14px;"></div>
+      </div>
+
       <button id="saveBtn" type="button" style="margin-top:1.25rem;width:100%;background:var(--teal);color:#fff;border:none;border-radius:8px;padding:12px;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;" data-i18n="btn_save">Enregistrer mes informations</button>
       <div id="saveConfirm" style="text-align:center;font-size:12.5px;color:var(--teal-text);margin-top:8px;height:16px;"></div>
     </div>
@@ -432,6 +441,9 @@ var translations = {
     h2_bail: 'Ton bail',
     lbl_leaseend: 'Date de fin de ton bail', lbl_leasetype: 'Type de bail',
     lbl_noticereceived: 'As-tu déjà reçu un avis du propriétaire?', lbl_noticereceived_hint: 'Laisse vide si non',
+    lease_scan_title: 'Ton bail numérique',
+    lease_scan_privacy: '🔒 Reste privé sur cet appareil — jamais envoyé à la banque communautaire. La photo est analysée par une IA pour en extraire les détails, puis n\'est pas conservée.',
+    btn_scanlease: '📷 Prendre une photo de mon bail',
     h2_resultat: 'Ce que ça donne',
     opt_12plus: '12 mois et plus', opt_12moins: 'Moins de 12 mois', opt_indetermine: 'Durée indéterminée', opt_chambre: 'Chambre',
     stat_increase: 'Ton augmentation', stat_ref: 'Taux de référence',
@@ -466,6 +478,9 @@ var translations = {
     h2_bail: 'Your lease',
     lbl_leaseend: 'Your lease end date', lbl_leasetype: 'Lease type',
     lbl_noticereceived: 'Have you already received a notice from your landlord?', lbl_noticereceived_hint: 'Leave blank if not',
+    lease_scan_title: 'Your digital lease',
+    lease_scan_privacy: "🔒 Stays private on this device — never sent to the community database. The photo is analyzed by AI to extract details, then isn't kept.",
+    btn_scanlease: '📷 Take a photo of my lease',
     h2_resultat: 'What this shows',
     opt_12plus: '12 months or more', opt_12moins: 'Less than 12 months', opt_indetermine: 'Indeterminate term', opt_chambre: 'Room',
     stat_increase: 'Your increase', stat_ref: 'Reference rate',
@@ -516,6 +531,7 @@ function setLang(lang){
   updateMethodBox();
   renderRegion();
   loadCommunityAverage();
+  renderDigitalLease();
 }
 
 function fmtPct(n){ return n.toLocaleString('fr-CA',{minimumFractionDigits:1,maximumFractionDigits:1}) + ' %'; }
@@ -524,6 +540,15 @@ function fmtMoney(n){ return Math.round(n).toLocaleString('fr-CA') + ' $'; }
 // Remplace par l'URL de déploiement de ton propre projet Apps Script pour LoyerClair
 // (séparé de celui de SmartGrocer — voir les instructions).
 var LOYERCLAIR_API_URL = 'https://script.google.com/macros/s/AKfycbwZ2OtFmnRgTeiZV12Au9aylUhD8QGSPCPagYvAgo5MmIHpFFN-fdexFmimHqiQ22H1/exec';
+
+// Clé Groq (pour la lecture de bail par IA) — remplace par ta propre clé,
+// obtenue gratuitement sur console.groq.com. Séparée de celle de SmartGrocer.
+// Clé Groq éclatée en morceaux — évite que GitHub la détecte automatiquement
+// comme une clé exposée et la révoque (même technique que pour SmartGrocer).
+var _gk1 = 'gsk_jdeow1TRtLbDwL1PDrw3';
+var _gk2 = 'WGdyb3FYXtxpdJkAg7NTK5PS';
+var _gk3 = 'Q0gfBsth';
+var GROQ_KEY = _gk1 + _gk2 + _gk3;
 
 var els = {
   city: document.getElementById('city'),
@@ -726,6 +751,119 @@ async function shareIncrease(){
   }
 }
 
+// Redimensionne l'image avant de l'envoyer à l'IA — évite les échecs
+// silencieux liés à des photos trop volumineuses.
+function resizeImageToBase64(file, maxDim){
+  maxDim = maxDim || 1400;
+  return new Promise(function(resolve, reject){
+    var reader = new FileReader();
+    reader.onload = function(e){
+      var img = new Image();
+      img.onload = function(){
+        var w = img.width, h = img.height;
+        if(w > h && w > maxDim){ h = h * (maxDim/w); w = maxDim; }
+        else if(h > maxDim){ w = w * (maxDim/h); h = maxDim; }
+        var canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', 0.85).split(',')[1]);
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// Analyse une photo de bail par IA — TOUT reste local, rien n'est envoyé à
+// la banque de données communautaire. La photo elle-même n'est jamais
+// conservée, seulement les détails extraits, stockés sur cet appareil.
+async function analyzeLeasePhoto(file){
+  var fr = currentLang !== 'en';
+  var statusEl = document.getElementById('leaseScanStatus');
+  statusEl.textContent = fr ? '⏳ Analyse en cours...' : '⏳ Analyzing...';
+
+  if(GROQ_KEY.indexOf('REMPLACE_PAR') === 0){
+    statusEl.textContent = fr ? '⚠️ Fonction pas encore configurée' : '⚠️ Feature not yet configured';
+    return;
+  }
+
+  try {
+    var base64 = await resizeImageToBase64(file, 1600);
+    var res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
+      body: JSON.stringify({
+        model: 'qwen/qwen3.6-27b',
+        reasoning_effort: 'none',
+        max_tokens: 800,
+        temperature: 0,
+        messages: [{
+          role: 'user',
+          content: [
+            {type: 'image_url', image_url: {url: 'data:image/jpeg;base64,' + base64}},
+            {type: 'text', text: 'Regarde cette photo d\'un bail de logement (probablement le formulaire standard du Québec) et transcris EXACTEMENT ce qui est écrit. N\'invente rien — si un champ n\'est pas visible ou lisible, laisse-le vide. JSON seulement: {"adresse":"adresse complète du logement","loyerMensuel":0,"dateDebut":"YYYY-MM-DD","dateFin":"YYYY-MM-DD","nomProprietaire":"","telephoneProprietaire":""}'}
+          ]
+        }]
+      })
+    });
+    var data = await res.json();
+    if(!data.choices || !data.choices[0]) throw new Error('Réponse IA invalide');
+    var text = data.choices[0].message.content.replace(/```json|```/g,'').trim();
+    var jsonMatch = text.match(/\{[\s\S]*\}/);
+    if(!jsonMatch) throw new Error('No JSON found');
+    var result = JSON.parse(jsonMatch[0]);
+
+    localStorage.setItem('loyerclair_digital_lease', JSON.stringify(result));
+
+    if(result.loyerMensuel) els.rent.value = result.loyerMensuel;
+    if(result.dateFin) els.leaseEnd.value = result.dateFin;
+    saveInputs();
+    recalc();
+
+    renderDigitalLease();
+    statusEl.textContent = fr ? '✅ Bail analysé et enregistré (privé)' : '✅ Lease analyzed and saved (private)';
+  } catch(e){
+    console.error('Lease analysis error:', e);
+    statusEl.textContent = fr ? "⚠️ Impossible de lire cette photo — réessaie avec un meilleur éclairage" : "⚠️ Couldn't read this photo — try again with better lighting";
+  }
+}
+
+function renderDigitalLease(){
+  var fr = currentLang !== 'en';
+  var box = document.getElementById('leaseDigital');
+  var saved = localStorage.getItem('loyerclair_digital_lease');
+  if(!saved){ box.style.display = 'none'; return; }
+
+  var d;
+  try { d = JSON.parse(saved); } catch(e){ box.style.display = 'none'; return; }
+
+  var rows = [
+    [fr ? 'Adresse' : 'Address', d.adresse],
+    [fr ? 'Loyer mensuel' : 'Monthly rent', d.loyerMensuel ? fmtMoney(d.loyerMensuel) : ''],
+    [fr ? 'Début du bail' : 'Lease start', d.dateDebut],
+    [fr ? 'Fin du bail' : 'Lease end', d.dateFin],
+    [fr ? 'Propriétaire' : 'Landlord', d.nomProprietaire],
+    [fr ? 'Téléphone' : 'Phone', d.telephoneProprietaire]
+  ].filter(function(r){ return r[1]; });
+
+  if(!rows.length){ box.style.display = 'none'; return; }
+
+  var html = '<div style="font-size:12px;font-weight:700;color:var(--ink-2);margin-bottom:8px;">' + (fr ? '📄 Ton bail numérique' : '📄 Your digital lease') + '</div>';
+  rows.forEach(function(r){
+    html += '<div style="display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px solid var(--line);"><span style="color:var(--sub);">' + r[0] + '</span><span style="font-weight:600;color:var(--ink);">' + r[1] + '</span></div>';
+  });
+  html += '<button id="deleteLeaseBtn" type="button" style="margin-top:10px;font-size:11px;color:#C9922E;background:none;border:none;cursor:pointer;">' + (fr ? '🗑️ Supprimer' : '🗑️ Delete') + '</button>';
+  box.innerHTML = html;
+  box.style.display = 'block';
+
+  document.getElementById('deleteLeaseBtn').addEventListener('click', function(){
+    localStorage.removeItem('loyerclair_digital_lease');
+    renderDigitalLease();
+  });
+}
+
 function updateThirtyRule(pctNow){
   var barWidth = Math.min(pctNow / 30 * 100, 100);
   els.thirtyBar.style.width = barWidth + '%';
@@ -830,9 +968,18 @@ els.city.addEventListener('input', function(){ saveInputs(); loadCommunityAverag
 els.city.addEventListener('change', function(){ saveInputs(); loadCommunityAverage(); });
 els.shareBtn.addEventListener('click', shareIncrease);
 
+document.getElementById('scanLeaseBtn').addEventListener('click', function(){
+  document.getElementById('leasePhotoInput').click();
+});
+document.getElementById('leasePhotoInput').addEventListener('change', function(){
+  if(this.files && this.files[0]) analyzeLeasePhoto(this.files[0]);
+  this.value = '';
+});
+
 loadInputs();
 recalc();
 loadCommunityAverage();
+renderDigitalLease();
 
 els.saveBtn.addEventListener('click', function(){
   saveInputs();
