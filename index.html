@@ -151,6 +151,11 @@
   .res-card p{font-size:13.5px;color:var(--ink-2);line-height:1.6;margin-bottom:8px;}
   .res-card a{color:var(--teal-text);font-weight:600;text-decoration:none;}
   .res-card a:hover{text-decoration:underline;}
+  @media print{
+    header, .tabs, .grid, footer, #printBtn, .lang-toggle{display:none !important;}
+    #printSummary{display:block !important;}
+    body{background:#fff;padding:0;}
+  }
   .option-card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:1.5rem;margin-bottom:1rem;display:flex;gap:16px;}
   .option-num{font-family:'Roboto Slab',serif;font-size:22px;font-weight:700;color:var(--teal);flex-shrink:0;width:32px;}
   .option-card h3{font-family:'Roboto Slab',serif;font-size:16px;font-weight:600;color:var(--ink);margin-bottom:8px;}
@@ -308,6 +313,8 @@
         <div style="position:absolute;top:0;bottom:0;left:30%;width:2px;background:var(--ink);"></div>
       </div>
       <div id="thirtyText" style="font-size:12.5px;color:var(--sub);margin-top:8px;line-height:1.5;"></div>
+
+      <button id="printBtn" type="button" style="margin-top:1.25rem;width:100%;background:transparent;color:var(--ink-2);border:1px solid var(--line);border-radius:8px;padding:12px;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;" data-i18n="btn_print">🖨️ Imprimer / Sauvegarder en PDF</button>
     </div>
 
   </div>
@@ -377,6 +384,25 @@
     LoyerClair donne une estimation à titre indicatif seulement — ce n'est pas une décision légale. Pour une confirmation officielle de ta situation précise, utilise le <a href="https://www.tal.gouv.qc.ca/fr/calcul-pour-l-augmentation-de-loyer" target="_blank" rel="noopener">calculateur officiel du Tribunal administratif du logement</a>.
   </footer>
 
+  <div id="printSummary" style="display:none;">
+    <div style="font-family:'Roboto Slab',serif;font-weight:700;font-size:22px;margin-bottom:4px;">LoyerClair — <span id="ps-title">Résumé de ta situation</span></div>
+    <div id="ps-date" style="font-size:12px;color:#5B6478;margin-bottom:20px;"></div>
+
+    <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
+      <tr><td style="padding:6px 0;border-bottom:1px solid #D7DCE6;font-weight:600;" id="ps-lbl-rent"></td><td style="padding:6px 0;border-bottom:1px solid #D7DCE6;text-align:right;" id="ps-val-rent"></td></tr>
+      <tr><td style="padding:6px 0;border-bottom:1px solid #D7DCE6;font-weight:600;" id="ps-lbl-increase"></td><td style="padding:6px 0;border-bottom:1px solid #D7DCE6;text-align:right;" id="ps-val-increase"></td></tr>
+      <tr><td style="padding:6px 0;border-bottom:1px solid #D7DCE6;font-weight:600;" id="ps-lbl-increasepct"></td><td style="padding:6px 0;border-bottom:1px solid #D7DCE6;text-align:right;" id="ps-val-increasepct"></td></tr>
+      <tr><td style="padding:6px 0;border-bottom:1px solid #D7DCE6;font-weight:600;" id="ps-lbl-ref"></td><td style="padding:6px 0;border-bottom:1px solid #D7DCE6;text-align:right;" id="ps-val-ref"></td></tr>
+      <tr><td style="padding:6px 0;border-bottom:1px solid #D7DCE6;font-weight:600;" id="ps-lbl-salary"></td><td style="padding:6px 0;border-bottom:1px solid #D7DCE6;text-align:right;" id="ps-val-salary"></td></tr>
+      <tr><td style="padding:6px 0;border-bottom:1px solid #D7DCE6;font-weight:600;" id="ps-lbl-pctnow"></td><td style="padding:6px 0;border-bottom:1px solid #D7DCE6;text-align:right;" id="ps-val-pctnow"></td></tr>
+      <tr><td style="padding:6px 0;font-weight:600;" id="ps-lbl-pctfuture"></td><td style="padding:6px 0;text-align:right;" id="ps-val-pctfuture"></td></tr>
+    </table>
+
+    <div id="ps-signal" style="padding:14px;border-radius:8px;margin-bottom:16px;font-size:13px;line-height:1.5;"></div>
+
+    <div style="font-size:11px;color:#5B6478;line-height:1.6;" id="ps-footer"></div>
+  </div>
+
 </div>
 
 <script>
@@ -401,6 +427,7 @@ var translations = {
     chart_title2: 'Repère : la règle du 30 %',
     note_reftaux: '<b>Taux de référence officiel 2026 :</b> 3,1 % (moyenne de l\'inflation sur 3 ans), pour les baux renouvelés entre le 2 avril 2026 et le 1er avril 2027. Ce taux est une référence, pas un plafond — un propriétaire peut justifier plus avec de vraies dépenses (taxes, assurances, rénovations).',
     btn_save: 'Enregistrer mes informations',
+    btn_print: '🖨️ Imprimer / Sauvegarder en PDF',
     legend_pct: '% du salaire pour le loyer',
     opt_joliette: 'Lanaudière / Joliette', opt_gatineau: 'Gatineau / Outaouais',
     coop_intro: "Contrairement aux HLM, il n'existe pas de guichet unique pour les coopératives et OBNL — il faut généralement contacter chaque organisme séparément. Ces deux ressources nationales peuvent t'aider à démarrer ta recherche, peu importe ta région :",
@@ -432,6 +459,7 @@ var translations = {
     chart_title2: 'Benchmark: the 30% rule',
     note_reftaux: '<b>Official 2026 reference rate:</b> 3.1% (average of 3-year inflation), for leases renewed between April 2, 2026 and April 1, 2027. This rate is a reference, not a cap — a landlord can justify more with real expenses (taxes, insurance, renovations).',
     btn_save: 'Save my information',
+    btn_print: '🖨️ Print / Save as PDF',
     legend_pct: '% of salary going to rent',
     opt_joliette: 'Lanaudière / Joliette', opt_gatineau: 'Gatineau / Outaouais',
     coop_intro: "Unlike HLM, there's no single point of entry for co-ops and non-profits — you generally need to contact each organization separately. These two national resources can help you start your search, wherever you are:",
@@ -718,9 +746,52 @@ recalc();
 
 els.saveBtn.addEventListener('click', function(){
   saveInputs();
-  els.saveConfirm.textContent = '✅ Enregistré sur cet appareil';
+  els.saveConfirm.textContent = currentLang === 'en' ? '✅ Saved on this device' : '✅ Enregistré sur cet appareil';
   setTimeout(function(){ els.saveConfirm.textContent = ''; }, 3000);
 });
+
+document.getElementById('printBtn').addEventListener('click', function(){
+  populatePrintSummary();
+  window.print();
+});
+
+function populatePrintSummary(){
+  var fr = currentLang !== 'en';
+  var rent = parseFloat(els.rent.value) || 0;
+  var increase = parseFloat(els.increase.value) || 0;
+  var salary = parseFloat(els.salary.value) || 0;
+  var increasePct = rent > 0 ? (increase / rent) * 100 : 0;
+  var pctNow = parseFloat(els.pctNow.textContent) || 0;
+  var pctFuture = parseFloat(els.pctFuture.textContent) || 0;
+
+  document.getElementById('ps-title').textContent = fr ? 'Résumé de ta situation' : 'Summary of your situation';
+  document.getElementById('ps-date').textContent = (fr ? 'Généré le ' : 'Generated on ') + fmtDate(new Date());
+
+  document.getElementById('ps-lbl-rent').textContent = fr ? 'Loyer actuel' : 'Current rent';
+  document.getElementById('ps-val-rent').textContent = fmtMoney(rent) + (fr ? ' / mois' : ' / month');
+  document.getElementById('ps-lbl-increase').textContent = fr ? 'Augmentation proposée' : 'Proposed increase';
+  document.getElementById('ps-val-increase').textContent = fmtMoney(increase) + (fr ? ' / mois' : ' / month');
+  document.getElementById('ps-lbl-increasepct').textContent = fr ? 'Augmentation en pourcentage' : 'Increase as a percentage';
+  document.getElementById('ps-val-increasepct').textContent = fmtPct(increasePct);
+  document.getElementById('ps-lbl-ref').textContent = fr ? 'Taux de référence officiel 2026' : 'Official 2026 reference rate';
+  document.getElementById('ps-val-ref').textContent = fmtPct(REF_RATE);
+  document.getElementById('ps-lbl-salary').textContent = fr ? 'Salaire annuel' : 'Annual salary';
+  document.getElementById('ps-val-salary').textContent = fmtMoney(salary);
+  document.getElementById('ps-lbl-pctnow').textContent = fr ? "Part du salaire pour le loyer, aujourd'hui" : "Share of salary going to rent, today";
+  document.getElementById('ps-val-pctnow').textContent = fmtPct(pctNow);
+  document.getElementById('ps-lbl-pctfuture').textContent = fr ? 'Part du salaire pour le loyer, dans 5 ans' : 'Share of salary going to rent, in 5 years';
+  document.getElementById('ps-val-pctfuture').textContent = fmtPct(pctFuture);
+
+  var signalEl = document.getElementById('ps-signal');
+  var isHigh = increasePct > REF_RATE * 1.5;
+  signalEl.style.background = isHigh ? '#FBF1E1' : '#E7F2EE';
+  signalEl.style.color = isHigh ? '#7A5A15' : '#245346';
+  signalEl.innerHTML = els.signalText.innerHTML;
+
+  document.getElementById('ps-footer').textContent = fr
+    ? "LoyerClair donne une estimation à titre indicatif seulement — ce n'est pas une décision légale. Confirme ta situation précise avec le calculateur officiel du TAL (tal.gouv.qc.ca)."
+    : "LoyerClair gives an estimate for informational purposes only — this is not a legal determination. Confirm your specific situation with the official TAL calculator (tal.gouv.qc.ca).";
+}
 
 document.querySelectorAll('.tab-btn').forEach(function(btn){
   btn.addEventListener('click', function(){
