@@ -192,6 +192,13 @@
       <h2 data-i18n="h2_situation">Ta situation</h2>
 
       <div class="field">
+        <label for="city" data-i18n="lbl_city">Ta ville <span class="hint" data-i18n="lbl_city_hint">Optionnel — sert seulement à comparer avec ta région</span></label>
+        <div class="input-row">
+          <input type="text" id="city" placeholder="Ex: Joliette" data-i18n-placeholder="lbl_city_ph">
+        </div>
+      </div>
+
+      <div class="field">
         <label for="rent" data-i18n="lbl_rent">Loyer actuel</label>
         <div class="input-row">
           <input type="number" id="rent" value="900" min="0" step="1">
@@ -289,6 +296,10 @@
           <div class="stat-value" id="refPercent">3,1 %</div>
         </div>
       </div>
+
+      <div id="communityBox" class="ref-note" style="margin-top:1rem;"></div>
+      <button id="shareBtn" type="button" style="margin-top:8px;width:100%;background:transparent;color:var(--teal-text);border:1px solid var(--teal);border-radius:8px;padding:10px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;" data-i18n="btn_share">🤝 Partager mon augmentation (anonyme)</button>
+      <div id="shareConfirm" style="text-align:center;font-size:12px;color:var(--teal-text);margin-top:6px;height:16px;"></div>
 
       <div class="chart-title" data-i18n="chart_title1">Loyer vs. salaire, sur 5 ans</div>
       <svg id="chart" viewBox="0 0 460 220"></svg>
@@ -413,6 +424,7 @@ var translations = {
     tagline: "Vois où ton loyer s'en va — et si ta hausse est dans la norme.",
     tab_calc: 'Calculateur', tab_logements: 'Logements abordables', tab_guide: 'Que faire?',
     h2_situation: 'Ta situation',
+    lbl_city: 'Ta ville', lbl_city_hint: 'Optionnel — sert seulement à comparer avec ta région', lbl_city_ph: 'Ex: Joliette',
     lbl_rent: 'Loyer actuel', lbl_increase: 'Augmentation proposée par le propriétaire',
     lbl_salary: 'Ton salaire annuel',
     lbl_salarygrowth: 'Croissance salariale estimée par année', lbl_salarygrowth_hint: 'Ta propre estimation — augmentation moyenne, échelon, etc.',
@@ -428,6 +440,7 @@ var translations = {
     note_reftaux: '<b>Taux de référence officiel 2026 :</b> 3,1 % (moyenne de l\'inflation sur 3 ans), pour les baux renouvelés entre le 2 avril 2026 et le 1er avril 2027. Ce taux est une référence, pas un plafond — un propriétaire peut justifier plus avec de vraies dépenses (taxes, assurances, rénovations).',
     btn_save: 'Enregistrer mes informations',
     btn_print: '🖨️ Imprimer / Sauvegarder en PDF',
+    btn_share: '🤝 Partager mon augmentation (anonyme)',
     legend_pct: '% du salaire pour le loyer',
     opt_joliette: 'Lanaudière / Joliette', opt_gatineau: 'Gatineau / Outaouais',
     coop_intro: "Contrairement aux HLM, il n'existe pas de guichet unique pour les coopératives et OBNL — il faut généralement contacter chaque organisme séparément. Ces deux ressources nationales peuvent t'aider à démarrer ta recherche, peu importe ta région :",
@@ -445,6 +458,7 @@ var translations = {
     tagline: 'See where your rent is going — and if your increase is within the norm.',
     tab_calc: 'Calculator', tab_logements: 'Affordable housing', tab_guide: 'What to do?',
     h2_situation: 'Your situation',
+    lbl_city: 'Your city', lbl_city_hint: 'Optional — only used to compare with your area', lbl_city_ph: 'E.g.: Joliette',
     lbl_rent: 'Current rent', lbl_increase: 'Increase proposed by the landlord',
     lbl_salary: 'Your annual salary',
     lbl_salarygrowth: 'Estimated salary growth per year', lbl_salarygrowth_hint: 'Your own estimate — average raise, step increase, etc.',
@@ -460,6 +474,7 @@ var translations = {
     note_reftaux: '<b>Official 2026 reference rate:</b> 3.1% (average of 3-year inflation), for leases renewed between April 2, 2026 and April 1, 2027. This rate is a reference, not a cap — a landlord can justify more with real expenses (taxes, insurance, renovations).',
     btn_save: 'Save my information',
     btn_print: '🖨️ Print / Save as PDF',
+    btn_share: '🤝 Share my increase (anonymous)',
     legend_pct: '% of salary going to rent',
     opt_joliette: 'Lanaudière / Joliette', opt_gatineau: 'Gatineau / Outaouais',
     coop_intro: "Unlike HLM, there's no single point of entry for co-ops and non-profits — you generally need to contact each organization separately. These two national resources can help you start your search, wherever you are:",
@@ -486,6 +501,9 @@ function applyTranslations(){
   document.querySelectorAll('[data-i18n-html]').forEach(function(el){
     el.innerHTML = t(el.getAttribute('data-i18n-html'));
   });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el){
+    el.placeholder = t(el.getAttribute('data-i18n-placeholder'));
+  });
 }
 
 function setLang(lang){
@@ -497,12 +515,18 @@ function setLang(lang){
   updateNoticeWindow();
   updateMethodBox();
   renderRegion();
+  loadCommunityAverage();
 }
 
 function fmtPct(n){ return n.toLocaleString('fr-CA',{minimumFractionDigits:1,maximumFractionDigits:1}) + ' %'; }
 function fmtMoney(n){ return Math.round(n).toLocaleString('fr-CA') + ' $'; }
 
+// Remplace par l'URL de déploiement de ton propre projet Apps Script pour LoyerClair
+// (séparé de celui de SmartGrocer — voir les instructions).
+var LOYERCLAIR_API_URL = 'https://script.google.com/macros/s/AKfycbwZ2OtFmnRgTeiZV12Au9aylUhD8QGSPCPagYvAgo5MmIHpFFN-fdexFmimHqiQ22H1/exec';
+
 var els = {
+  city: document.getElementById('city'),
   rent: document.getElementById('rent'),
   increase: document.getElementById('increase'),
   salary: document.getElementById('salary'),
@@ -526,7 +550,10 @@ var els = {
   noticeReceived: document.getElementById('noticeReceived'),
   methodBox: document.getElementById('methodBox'),
   saveBtn: document.getElementById('saveBtn'),
-  saveConfirm: document.getElementById('saveConfirm')
+  saveConfirm: document.getElementById('saveConfirm'),
+  communityBox: document.getElementById('communityBox'),
+  shareBtn: document.getElementById('shareBtn'),
+  shareConfirm: document.getElementById('shareConfirm')
 };
 
 var REF_RATE = 3.1;
@@ -620,7 +647,7 @@ function updateMethodBox(){
 
 function saveInputs(){
   var data = {
-    rent: els.rent.value, increase: els.increase.value, salary: els.salary.value,
+    city: els.city.value, rent: els.rent.value, increase: els.increase.value, salary: els.salary.value,
     salaryGrowth: els.salaryGrowth.value, rentGrowth: els.rentGrowth.value,
     leaseEnd: els.leaseEnd.value, leaseType: els.leaseType.value, noticeReceived: els.noticeReceived.value
   };
@@ -630,6 +657,7 @@ function saveInputs(){
 function loadInputs(){
   try {
     var data = JSON.parse(localStorage.getItem('loyerclair_data') || '{}');
+    if(data.city) els.city.value = data.city;
     if(data.rent) els.rent.value = data.rent;
     if(data.increase) els.increase.value = data.increase;
     if(data.salary) els.salary.value = data.salary;
@@ -639,6 +667,63 @@ function loadInputs(){
     if(data.leaseType) els.leaseType.value = data.leaseType;
     if(data.noticeReceived) els.noticeReceived.value = data.noticeReceived;
   } catch(e){}
+}
+
+// Charge la moyenne des augmentations partagées anonymement pour la ville entrée.
+async function loadCommunityAverage(){
+  var fr = currentLang !== 'en';
+  var city = els.city.value.trim();
+  if(!city || LOYERCLAIR_API_URL.indexOf('REMPLACE_PAR') === 0){
+    els.communityBox.innerHTML = fr
+      ? 'Entre ta ville pour voir la moyenne des augmentations partagées par la communauté dans ta région.'
+      : 'Enter your city to see the average of increases shared by the community in your area.';
+    return;
+  }
+  try {
+    var res = await fetch(LOYERCLAIR_API_URL + '?action=avgGet&city=' + encodeURIComponent(city));
+    var data = await res.json();
+    if(data.found && data.count > 0){
+      els.communityBox.innerHTML = fr
+        ? ('<b>' + data.count + ' partage' + (data.count>1?'s':'') + ' anonyme' + (data.count>1?'s':'') + ' à ' + city + ' :</b> augmentation moyenne de <b>' + fmtPct(data.avg) + '</b>.')
+        : ('<b>' + data.count + ' anonymous share' + (data.count>1?'s':'') + ' in ' + city + ':</b> average increase of <b>' + fmtPct(data.avg) + '</b>.');
+    } else {
+      els.communityBox.innerHTML = fr
+        ? ('Personne n\'a encore partagé d\'augmentation pour ' + city + ' — sois le ou la premier·ère!')
+        : ('No one has shared an increase for ' + city + ' yet — be the first!');
+    }
+  } catch(e){
+    console.log('Chargement de la moyenne communautaire échoué (silencieux):', e);
+  }
+}
+
+// Partage anonymement l'augmentation calculée avec la communauté — aucune
+// donnée personnelle envoyée, seulement la ville et le pourcentage.
+async function shareIncrease(){
+  var fr = currentLang !== 'en';
+  var city = els.city.value.trim();
+  if(!city){
+    els.shareConfirm.textContent = fr ? '⚠️ Entre ta ville d\'abord' : '⚠️ Enter your city first';
+    setTimeout(function(){ els.shareConfirm.textContent = ''; }, 3000);
+    return;
+  }
+  if(LOYERCLAIR_API_URL.indexOf('REMPLACE_PAR') === 0) return;
+
+  var rent = parseFloat(els.rent.value) || 0;
+  var increase = parseFloat(els.increase.value) || 0;
+  var increasePct = rent > 0 ? (increase / rent) * 100 : 0;
+  if(increasePct <= 0) return;
+
+  try {
+    await fetch(LOYERCLAIR_API_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'avgSave', city: city, increasePct: increasePct })
+    });
+    els.shareConfirm.textContent = fr ? '✅ Merci d\'avoir partagé!' : '✅ Thanks for sharing!';
+    setTimeout(function(){ els.shareConfirm.textContent = ''; }, 3000);
+    loadCommunityAverage();
+  } catch(e){
+    console.log('Partage échoué:', e);
+  }
 }
 
 function updateThirtyRule(pctNow){
@@ -741,8 +826,13 @@ function drawChart(data){
   el.addEventListener('change', recalc);
 });
 
+els.city.addEventListener('input', function(){ saveInputs(); loadCommunityAverage(); });
+els.city.addEventListener('change', function(){ saveInputs(); loadCommunityAverage(); });
+els.shareBtn.addEventListener('click', shareIncrease);
+
 loadInputs();
 recalc();
+loadCommunityAverage();
 
 els.saveBtn.addEventListener('click', function(){
   saveInputs();
